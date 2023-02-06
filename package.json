@@ -1,8 +1,8 @@
 {
   "name": "roman-hnizdo-app",
-  "productName": "roman-hnizdo-app",
+  "productName": "Die Normaufsicht",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "ElectronJS desktop application, that keeps track of employees, orders and if the welders are performing based on a given norm",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -13,8 +13,8 @@
   },
   "keywords": [],
   "author": {
-    "name": "lukas.soukup",
-    "email": "lukas.soukup@plus4u.net"
+    "name": "Lukas Soukup",
+    "email": "soukup.199717@centrum.cz"
   },
   "license": "MIT",
   "devDependencies": {
@@ -24,6 +24,9 @@
     "@electron-forge/maker-squirrel": "^6.0.4",
     "@electron-forge/maker-zip": "^6.0.4",
     "@electron-forge/plugin-webpack": "^6.0.4",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
@@ -33,12 +36,16 @@
     "eslint-plugin-import": "^2.27.5",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
     "node-loader": "^2.0.0",
+    "react-refresh": "^0.14.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
+    "type-fest": "^3.5.5",
     "typescript": "~4.5.4"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

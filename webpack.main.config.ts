@@ -2,11 +2,17 @@ import type { Configuration } from 'webpack';
 
 import { rules } from './webpack.rules';
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 export const mainConfig: Configuration = {
   /**
    * This is the main entry point for your application, it's the first file
    * that runs in the main process.
    */
+  mode: isDevelopment ? 'development' : 'production',
+  devServer: {
+    client: { overlay: false },
+  },
   entry: './src/index.ts',
   // Put your normal webpack config below here
   module: {
