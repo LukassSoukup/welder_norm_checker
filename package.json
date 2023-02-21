@@ -6,6 +6,7 @@
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
+    "build": "electron-forge make",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -46,6 +47,28 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  }
+    "react-dom": "^18.2.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "plugins": [
+    [
+      "@electron-forge/plugin-webpack",
+      {
+        "mainConfig": "./webpack.main.config.ts",
+        "renderer": {
+          "config": "./webpack.renderer.config.ts",
+          "entryPoints": [
+            {
+              "html": "./src/index.html",
+              "js": "./src/renderer.tsx",
+              "name": "main_window",
+              "preload": {
+                "js": "./src/preload.ts"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  ]
 }

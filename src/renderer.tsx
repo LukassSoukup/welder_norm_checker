@@ -25,6 +25,22 @@
  *  });
  * ```
  */
+declare global {
+    interface Window {
+        electronAPI: {
+            setTitle: (text:string) => void;
+        };
+        versions: {
+            node: () => string;
+            chrome: () => string;
+            electron: () => string;
+            ping: () => string;
+            notificationApi: {
+                sendNotification: (message: string) => void;
+            }
+        }
+    }
+}
 
 import './index.css';
 import React from 'react';

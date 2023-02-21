@@ -13,8 +13,9 @@
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "paths": {
-      "*": ["node_modules/*"]
-    }
+      "*": ["*","node_modules/*"]
+    },
+    "types": ["electron"]
   },
   "include": ["src/**/*"]
 }
