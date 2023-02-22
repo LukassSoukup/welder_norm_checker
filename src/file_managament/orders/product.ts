@@ -5,9 +5,12 @@ export class Product {
     private articleNum: string;
     private amount: number;
     private detail: string | void;
-    constructor(articleNum:string, amount: number, detail: string | void) {
+    private timeToComplete: number;
+
+    constructor(articleNum:string, amount: number, timeToComplete: number, detail: string | void) {
         this.articleNum = articleNum;
         this.amount = amount;
+        this.timeToComplete = timeToComplete;
         this.detail = detail;
     }
 
@@ -18,6 +21,7 @@ export class Product {
         return {
             articleNum: this.articleNum,
             amount: this.amount,
+            timeToComplete: this.timeToComplete,
             detail: this.detail,
         }
     }

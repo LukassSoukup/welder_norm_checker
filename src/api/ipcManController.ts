@@ -7,7 +7,7 @@ ipcMain.on('set-title', (event, title) => {
 });
 
 ipcMain.on("notify", (_, message) => {
-    const notification = new Notification({ title: "Notification", body: message });
+    const notification = new Notification({title: "Notification", body: message});
     notification.show();
 });
 

@@ -28,7 +28,7 @@
 declare global {
     interface Window {
         electronAPI: {
-            setTitle: (text:string) => void;
+            setTitle: (text: string) => void;
         };
         versions: {
             node: () => string;
@@ -38,7 +38,35 @@ declare global {
             notificationApi: {
                 sendNotification: (message: string) => void;
             }
-        }
+        };
+        Order: {
+            create: (obj: object) => void;
+            update: (obj: object) => void;
+            delete: (id: string) => void;
+            get: (id: string) => object;
+            list: () => object[];
+        };
+        Product: {
+            create: (obj: object) => void;
+            update: (obj: object) => void;
+            delete: (id: string) => void;
+            get: (id: string) => object;
+            list: () => object[];
+        };
+        Employee: {
+            create: (obj: object) => void;
+            update: (obj: object) => void;
+            delete: (id: string) => void;
+            get: (id: string) => object;
+            list: () => object[];
+        };
+        DailyLog: {
+            create: (obj: object) => void;
+            update: (obj: object) => void;
+            delete: (id: string) => void;
+            get: (id: string) => object;
+            list: (employeeId: string) => object[];
+        };
     }
 }
 

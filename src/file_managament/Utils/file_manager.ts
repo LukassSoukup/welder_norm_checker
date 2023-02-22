@@ -1,55 +1,65 @@
-import * as fs from "fs";
-import * as fsAsync from "fs/promises";
+import { promises as fs } from 'fs';
 import {validateUniqueFile} from "./file_validator";
 import * as path from "path";
+import {errorLogger, infoLogger} from "../constants/file_paths";
 
-function createFile(filePath:string, content:string):void {
-    // validate if path exist, if no create it
-    // validate if fileName exists, if yes throw error
+async function createFile(filePath: string, content: object): Promise<void> {
+    filePath += ".json";
     try {
         validateUniqueFile(filePath);
-        fs.writeFileSync(filePath, content);
-    } catch(err) {
-        console.error(err);
+        await fs.writeFile(filePath, JSON.stringify(content, null, 2));
+        infoLogger(`File saved to ${filePath}`);
+    } catch (err) {
+        errorLogger(err);
     }
 }
 
-function updateFile(filePath:string, content:string):void {
-    // validate if fileName exists, if yes throw error
-    // TODO UNFINISHED
+async function updateFile(filePath: string, newContent: object): Promise<void> {
+    filePath += ".json";
     try {
-        fs.writeFileSync(filePath, content);
-    } catch(err) {
-        console.error(err);
+        const obj = await loadFile(filePath);
+        await fs.writeFile(filePath, {...obj, ...newContent});
+    } catch (err) {
+        errorLogger(err);
     }
 }
 
-function loadFile(filePath:string, callback: (obj:object)=> void) {
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error(`Failed to read products file: ${err}`);
-            callback(null);
-            return;
-        }
-        try {
-            const jsonData = JSON.parse(data.toString());
-            callback(jsonData);
-        } catch (err) {
-            console.error(`Failed to parse products data: ${err}`);
-            callback(null);
-        }
-    });
+async function loadFile(filePath: string) {
+    filePath += ".json";
+    try {
+        const data = await fs.readFile(filePath, "utf8");
+        infoLogger(`Loading data from ${filePath}\n${data}`);
+        return JSON.parse(data.toString());
+    } catch (err) {
+        errorLogger(err);
+    }
 }
-
-async function loadFiles(dirPath: string): Promise<{ name: string; content: string }[]> {
-    const fileNames = await fsAsync.readdir(dirPath);
-
-    return await Promise.all(fileNames.map(async (name) => {
-        const content = await fsAsync.readFile(path.join(dirPath, name), { encoding: 'utf-8' });
-        return { name, content };
+async function loadFiles(dirPath: string): Promise<IlistResponse> {
+    try {
+    const fileNames = await fs.readdir(dirPath);
+    const response:IlistResponse = {};
+    await Promise.all(fileNames.map(async (name: string) => {
+        let content = await fs.readFile(path.join(dirPath, name), {encoding: 'utf-8'});
+        content = JSON.parse(content.toString());
+        response[name.split('.')[0]] = content;
     }));
+    return response;
+    } catch (err) {
+        errorLogger(err);
+    }
+}
+
+async function deleteFile(filePath: string): Promise<void> {
+    filePath += ".json";
+    try {
+        const fileExists = await fs.stat(filePath);
+        if(!fileExists) throw new Error(`File ${filePath} does not exist!`);
+        await fs.unlink(filePath);
+    } catch (err) {
+        errorLogger(err);
+    }
 }
 
 
 
-export {createFile, loadFile, loadFiles}
+export {createFile, loadFile, loadFiles, updateFile, deleteFile}

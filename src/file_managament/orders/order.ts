@@ -7,13 +7,11 @@ export class Order {
    private orderNumber: string;
     private dueDate: string;
     private listOfProducts: Product[];
-    private timeToComplete: number;
     private state: boolean;
-    constructor(orderNumber:string, dueDate:string, listOfProducts:Product[], timeToComplete: number, state:boolean) {
+    constructor(orderNumber:string, dueDate:string, listOfProducts:Product[], state:boolean) {
         this.orderNumber = orderNumber;
         this.dueDate = dueDate;
         this.listOfProducts = listOfProducts;
-        this.timeToComplete = timeToComplete; // ?? could be for product, TODO ask Roman
         this.state = state;
     }
 
@@ -27,7 +25,6 @@ export class Order {
             orderNumber: this.orderNumber,
             dueDate: this.dueDate,
             listOfProducts: this.listOfProducts,
-            timeToComplete: this.timeToComplete,
             state: this.state,
         }
     }
