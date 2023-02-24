@@ -1,5 +1,4 @@
 import { app, BrowserWindow, screen  } from 'electron';
-import "./api/ipcManController";
 import "./api/orderController";
 import "./api/productController";
 import {createFilePath} from "./file_managament/Utils/file_validator";

@@ -7,9 +7,9 @@ interface IOrder {
 
 interface IProduct {
     articleNum: string;
-    amount: number;
     timeToComplete: string,
     detail: string | void;
+    amount?: number
 }
 
 interface IEmployee {

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-interface ProductFormProps {
-    onSubmit: ({ articleNum, amount, timeToComplete, detail }: { articleNum: string, amount: number, timeToComplete: string, detail: string }) => void;
-}
+type ProductCreateFormProps = {
+    addProductToOrder: (articleNum: string, amount: number) => void;
+};
 
-export const ProductCreateForm: React.FC<ProductFormProps> = ({ onSubmit }) => {
+export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) => {
     const [articleNum, setArticleNum] = useState('');
     const [amount, setAmount] = useState(0);
-    const [timeToComplete, setTimeToComplete] = useState('');
+    const [timeToComplete, setTimeToComplete] = useState("00:30");
     const [detail, setDetail] = useState('');
     const eraseValues = () => {
         setArticleNum('');
@@ -15,8 +15,11 @@ export const ProductCreateForm: React.FC<ProductFormProps> = ({ onSubmit }) => {
         setTimeToComplete('');
         setDetail('');
     }
-    const handleSubmit = () => {
-        onSubmit({articleNum, amount, timeToComplete, detail});
+
+    const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        event.preventDefault();
+        window.Product.create({articleNum, timeToComplete, detail})
+        addProductToOrder(articleNum, amount);
         eraseValues()
     };
 
@@ -41,7 +44,7 @@ export const ProductCreateForm: React.FC<ProductFormProps> = ({ onSubmit }) => {
                 Poznámka:
                 <input type="text" value={detail} onChange={event => setDetail(event.target.value)} />
             </label>
-            <button onClick={() => handleSubmit()} type="submit">Přidat</button>
+            <button onClick={(e) => handleSubmit(e)} type="submit">Přidat</button>
         </div>
     )
 }

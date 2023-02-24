@@ -1,24 +1,58 @@
 import {ipcMain} from "electron";
-import {validateOrderCreateInput, validateOrderGetInput} from "../file_managament/Utils/inputValidation";
-import {createFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
+import {
+    validateProductGetInput, validateProductCreateInput,
+} from "../file_managament/Utils/inputValidation";
+import {createFile, deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
 import Path from "path";
-import {ORDER_FILE_PATH} from "../file_managament/constants/file_paths";
+import {
+    errorLogger,
+    PRODUCT_FILE_PATH, ValidationCreateErr,
+    ValidationDeleteErr,
+    ValidationGetErr,
+    ValidationUpdateErr
+} from "../file_managament/constants/file_paths";
 
-ipcMain.on('createProduct', (event, order) => {
-    validateOrderCreateInput(order);
-    createFile(Path.join(ORDER_FILE_PATH, order.orderNumber), order);
+const TYPE = "produktu";
+ipcMain.on('createProduct', async (event, product) => {
+    try {
+        validateProductCreateInput(product);
+        await createFile(Path.join(PRODUCT_FILE_PATH, product.articleNum), product);
+    } catch (err) {
+        errorLogger(err);
+        ValidationCreateErr(TYPE, err, product.articleNum);
+    }
 });
 
-ipcMain.handle('getProduct', async (event, orderName) => {
-    validateOrderGetInput(orderName);
-    return await loadFile(Path.join(ORDER_FILE_PATH, orderName));
+ipcMain.handle('getProduct', async (event, articleNum) => {
+    try {
+        validateProductGetInput(articleNum);
+        return await loadFile(Path.join(PRODUCT_FILE_PATH, articleNum));
+    } catch (err) {
+        errorLogger(err);
+        ValidationGetErr(TYPE, err, articleNum);
+    }
 });
 
 ipcMain.handle('listProducts', async () => {
-    return await loadFiles(Path.join(ORDER_FILE_PATH));
+    return await loadFiles(Path.join(PRODUCT_FILE_PATH));
 });
 
-ipcMain.on('updateProduct', async (event, order) => {
-    validateOrderGetInput(order.orderName);
-    await updateFile(Path.join(ORDER_FILE_PATH, order.orderNumber), order);
+ipcMain.on('updateProduct', async (event, product) => {
+    try {
+        validateProductGetInput(product.articleNum);
+        await updateFile(Path.join(PRODUCT_FILE_PATH, product.articleNum), product);
+    } catch (err) {
+        errorLogger(err);
+        ValidationUpdateErr(TYPE, err, product.articleNum);
+    }
+});
+
+ipcMain.on('deleteProduct', async (event, articleNum) => {
+    try {
+        validateProductGetInput(articleNum);
+        await deleteFile(Path.join(PRODUCT_FILE_PATH, articleNum));
+    } catch (err) {
+        errorLogger((err));
+        ValidationDeleteErr(TYPE, err, articleNum);
+    }
 });

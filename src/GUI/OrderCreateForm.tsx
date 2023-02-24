@@ -1,38 +1,44 @@
 import React, {useState} from 'react';
 import {ProductCreateForm} from "./ProductCreateForm";
 
+type ProductInOrderType = Record<string, number>;
 
-export const OrderCreateForm = async() => {
+export const OrderCreateForm = () => {
     const [orderNumber, setOrderNumber] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [listOfProducts, setListOfProducts] = useState<IProduct[]>([]);
+    const [listOfProducts, setListOfProducts] = useState<ProductInOrderType>({});
     const [showAddProductForm, setShowAddProductForm] = useState(false);
 
-
-    console.log(await window.Order.list());
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log("creating order...");
-        window.Order.create({orderNumber, dueDate, listOfProducts})
+        window.Order.create({orderNumber, dueDate, listOfProducts});
+        eraseValues();
         console.log("request submitted");
     };
 
-    const handleAddProduct = (product: IProduct) => {
-        setListOfProducts([
-            ...listOfProducts,
-            product
-        ]);
-    };
+    const eraseValues = () => {
+        setOrderNumber('');
+        setDueDate('');
+        setListOfProducts({});
+        setShowAddProductForm(false);
+    }
+
+    const addProductToOrder = (articleNum: string, amount: number) => {
+        setListOfProducts((prev) => {
+            return {...prev, [articleNum]: amount }
+        });
+    }
 
     return (
         <form onSubmit={handleSubmit}>
             <label>
-                Order Number:
+                Číslo zakázky:
                 <input type="text" value={orderNumber} onChange={event => setOrderNumber(event.target.value)}/>
             </label>
             <br/>
             <label>
-                Due Date:
+                Dodací lhůta
                 <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)}/>
             </label>
             <br/>
@@ -40,9 +46,9 @@ export const OrderCreateForm = async() => {
                 {!showAddProductForm ? "Přidat produkt" : "Zavřít"}
                 <input type="checkbox" onChange={() => setShowAddProductForm((prev) => !prev)}/>
             </label>
-            {showAddProductForm ? <ProductCreateForm onSubmit={handleAddProduct}/> : null}
+            {showAddProductForm ? <ProductCreateForm addProductToOrder={addProductToOrder} /> : null}
             <br/>
-            <button type="submit">Submit</button>
+            <button type="submit">Založit objednávku</button>
         </form>
     );
 };

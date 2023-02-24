@@ -3,17 +3,6 @@
 
 import {ipcRenderer, contextBridge} from "electron";
 
-contextBridge.exposeInMainWorld('versions', {
-    node: () => process.versions.node,
-    chrome: () => process.versions.chrome,
-    electron: () => process.versions.electron,
-    ping: () => ipcRenderer.invoke('ping'),
-    notificationApi: {
-        sendNotification(message: string) {
-            ipcRenderer.send("notify", message);
-        },
-    },
-});
 // ipcRenderer.send is used to send a message to the main process ->
 // ipcRenderer.invoke is used to send a message and wait for a response from the main process <->
 

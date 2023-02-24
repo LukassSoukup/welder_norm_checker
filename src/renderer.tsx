@@ -27,24 +27,12 @@
  */
 declare global {
     interface Window {
-        electronAPI: {
-            setTitle: (text: string) => void;
-        };
-        versions: {
-            node: () => string;
-            chrome: () => string;
-            electron: () => string;
-            ping: () => string;
-            notificationApi: {
-                sendNotification: (message: string) => void;
-            }
-        };
         Order: {
             create: (obj: object) => void;
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
-            list: () => object[];
+            list: () => Promise<IlistResponse>;
         };
         Product: {
             create: (obj: object) => void;
