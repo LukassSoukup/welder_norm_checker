@@ -48,7 +48,7 @@ export const OrderCreateForm = () => {
             </label>
             {showAddProductForm ? <ProductCreateForm addProductToOrder={addProductToOrder} /> : null}
             <br/>
-            <button type="submit">Založit objednávku</button>
+            <button type="submit" disabled={Object.keys(listOfProducts).length === 0}>Založit objednávku</button>
         </form>
     );
 };

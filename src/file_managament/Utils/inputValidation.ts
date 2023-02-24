@@ -11,6 +11,7 @@ export function validateOrderGetInput(orderNumber: string): void {
 
 export function validateProductCreateInput(obj: IProduct): void {
     if(!obj.articleNum) throw isRequiredButMissingErr("Product.articleNum");
+    if(!obj.price) throw isRequiredButMissingErr("Product.price");
     if(!obj.timeToComplete) throw isRequiredButMissingErr("Product.timeToComplete");
 }
 export function validateProductGetInput(articleNum: string): void {
@@ -19,6 +20,9 @@ export function validateProductGetInput(articleNum: string): void {
 
 export function validateEmployeeInput(obj: IEmployee): void {
     if(!obj.name) throw isRequiredButMissingErr("Employee.name");
+}
+export function validateEmployeeGetInput(id: string): void {
+    if(!id) throw isRequiredButMissingErr("Employee.id");
 }
 
 export function validateDailyLogInput(obj: IDailyLog): void {

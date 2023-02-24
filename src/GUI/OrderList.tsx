@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import "./css/orderList.css";
 
 export const OrderList = () => {
     const [orderList, setOrderList] = useState<IlistResponse>({});
@@ -23,7 +24,9 @@ export const OrderList = () => {
                             {order.listOfProducts.map((product: IProduct) => (
                                 <li key={product.articleNum} className="product-item">
                                     <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
-                                    <p className="time-to-complete">Čas na zpracování {product.timeToComplete}</p>
+                                    <p className="price-per-product">Cena za kus: {product.price},- Kč</p>
+                                    <p className="product-amount">Počet: {product.amount}</p>
+                                    <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
                                     {product.detail && <p className="detail">Popisek: {product.detail}</p>}
                                 </li>
                             ))}

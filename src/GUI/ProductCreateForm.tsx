@@ -7,12 +7,14 @@ type ProductCreateFormProps = {
 export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) => {
     const [articleNum, setArticleNum] = useState('');
     const [amount, setAmount] = useState(0);
+    const [price, setPrice] = useState(0);
     const [timeToComplete, setTimeToComplete] = useState("00:30");
     const [detail, setDetail] = useState('');
     const eraseValues = () => {
         setArticleNum('');
         setAmount(0);
-        setTimeToComplete('');
+        setPrice(100);
+        setTimeToComplete("00:30");
         setDetail('');
     }
 
@@ -28,6 +30,11 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
             <label>
                 Artikel-Nr.:
                 <input type="text" value={articleNum} onChange={event => setArticleNum(event.target.value)} required/>
+            </label>
+            <br />
+            <label>
+                Cena za kus:
+                <input type="number" value={price} onChange={event => setPrice(Number(event.target.value))} required/>Kč
             </label>
             <br />
             <label>

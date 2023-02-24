@@ -7,18 +7,22 @@ interface IOrder {
 
 interface IProduct {
     articleNum: string;
+    price: number;
     timeToComplete: string,
-    detail: string | void;
+    detail?: string;
     amount?: number
 }
 
 interface IEmployee {
     name: string;
+    id?: string;
 }
 
 interface IDailyLog {
     employeeId: string;
-    workTime: number;
+    arrivedToWork: string;
+    leftWork: string;
+    workTime?: number;
     productList: object;
 }
 
