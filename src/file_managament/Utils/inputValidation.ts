@@ -1,4 +1,5 @@
 import {isRequiredButMissingErr} from "../constants/file_paths";
+import {isIsoDate} from "./calculationHelper";
 
 export function validateOrderCreateInput(obj: IOrder): void {
     if(!obj.orderNumber) throw isRequiredButMissingErr("Order.orderNumber");
@@ -25,9 +26,26 @@ export function validateEmployeeGetInput(id: string): void {
     if(!id) throw isRequiredButMissingErr("Employee.id");
 }
 
-export function validateDailyLogInput(obj: IDailyLog): void {
-    if(!obj.employeeId) throw isRequiredButMissingErr("DailyLog.employeeId");
-    if(!obj.workTime) throw isRequiredButMissingErr("DailyLog.workTime");
+export function validateDailyLogAddInput(employeeId:string, obj: IDailyLog): void {
+    if(!employeeId) throw isRequiredButMissingErr("employeeId");
+    if(!obj.arrivedToWork) throw isRequiredButMissingErr("DailyLog.arrivedToWork");
+    if(!obj.leftWork) throw isRequiredButMissingErr("DailyLog.leftWork");
     if(!obj.productList) throw isRequiredButMissingErr("DailyLog.productList");
 }
 
+export function validateDailyLogGetInput(employeeId: string, recorded: string /*ISOString*/): void {
+    if(!employeeId) throw isRequiredButMissingErr("DailyLog.employeeId");
+    if(!recorded) throw isRequiredButMissingErr("DailyLog.recorded");
+}
+
+export function validateDailyLogListInput(employeeId: string): void {
+    if(!employeeId) throw isRequiredButMissingErr("DailyLog.employeeId");
+}
+
+export function validateISODateFormatInput(date: string): void {
+    if(!isIsoDate(date)) {
+        const e = new Error(`Date ${date} is not valid ISO format.`);
+        e.name = "invalidISODate";
+        throw e;
+    }
+}

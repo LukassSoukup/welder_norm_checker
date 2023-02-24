@@ -53,7 +53,9 @@ ipcMain.handle('listOrders', async () => {
 ipcMain.on('updateOrder', async (event, order) => {
     try {
         validateOrderGetInput(order.orderNumber);
-        await updateFile(Path.join(ORDER_FILE_PATH, order.orderNumber), order);
+        const fpath = Path.join(ORDER_FILE_PATH, order.orderNumber);
+        const oldOrder = await loadFile(fpath);
+        await updateFile(fpath, {...oldOrder, ...order});
     } catch (err) {
         errorLogger(err);
         ValidationGetErr(TYPE, err, order.orderNumber);

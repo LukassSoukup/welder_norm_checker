@@ -40,7 +40,9 @@ ipcMain.handle('listProducts', async () => {
 ipcMain.on('updateProduct', async (event, product) => {
     try {
         validateProductGetInput(product.articleNum);
-        await updateFile(Path.join(PRODUCT_FILE_PATH, product.articleNum), product);
+        const fpath = Path.join(PRODUCT_FILE_PATH, product.articleNum);
+        const oldProduct = await loadFile(fpath);
+        await updateFile(fpath, {...oldProduct, ...product});
     } catch (err) {
         errorLogger(err);
         ValidationUpdateErr(TYPE, err, product.articleNum);

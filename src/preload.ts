@@ -6,10 +6,6 @@ import {ipcRenderer, contextBridge} from "electron";
 // ipcRenderer.send is used to send a message to the main process ->
 // ipcRenderer.invoke is used to send a message and wait for a response from the main process <->
 
-contextBridge.exposeInMainWorld('electronAPI', {
-    setTitle: (title: string) => ipcRenderer.send('set-title', title)
-})
-
 contextBridge.exposeInMainWorld('Order', {
     create: (order: object) => ipcRenderer.send('createOrder', order),
     update: (order: object) => ipcRenderer.send('updateOrder', order),
@@ -35,9 +31,10 @@ contextBridge.exposeInMainWorld('Employee', {
 });
 
 contextBridge.exposeInMainWorld('DailyLog', {
-    create: (dailyLog: object) => ipcRenderer.send('createDailyLog', dailyLog),
+    create: (dailyLog: object) => ipcRenderer.send('addDailyLog', dailyLog),
     update: (dailyLog: object) => ipcRenderer.send('updateDailyLog', dailyLog),
     delete: (id: string) => ipcRenderer.send('deleteDailyLog', id),
     get: (id: string) => ipcRenderer.invoke('getDailyLog', id),
-    list: (employeeId: string) => ipcRenderer.invoke("listDailyLogsForEmployee", employeeId)
+    list: (employeeId: string) => ipcRenderer.invoke("listLogsByMonthAndEmployee", employeeId),
+    listAll: () => ipcRenderer.invoke("listAllLogsByMonth")
 });

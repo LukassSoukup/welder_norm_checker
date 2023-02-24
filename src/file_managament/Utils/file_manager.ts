@@ -1,7 +1,7 @@
 import {promises as fs} from 'fs';
 import {validateUniqueFile} from "./file_validator";
 import * as path from "path";
-import {errorLogger, infoLogger} from "../constants/file_paths";
+import {debugLogger, errorLogger, infoLogger} from "../constants/file_paths";
 import {dialog} from 'electron';
 
 async function createFile(filePath: string, content: object): Promise<void> {
@@ -19,8 +19,7 @@ async function createFile(filePath: string, content: object): Promise<void> {
 async function updateFile(filePath: string, newContent: object): Promise<void> {
     filePath += ".json";
     try {
-        const obj = await loadFile(filePath);
-        await fs.writeFile(filePath, {...obj, ...newContent});
+        await fs.writeFile(filePath, JSON.stringify(newContent, null, 2));
         infoLogger(`File updated in ${filePath}`);
     } catch (err) {
         errorLogger(err);
@@ -49,7 +48,8 @@ async function loadFiles(dirPath: string): Promise<any> {
             content = JSON.parse(content.toString());
             response.push(content);
         }));
-        infoLogger(`Loading multiple files from ${dirPath}`);
+        if(response.length === 0) debugLogger(`No records found at ${dirPath}`);
+        else infoLogger(`Loading multiple files from ${dirPath}`);
         return response;
     } catch (err) {
         errorLogger(err);

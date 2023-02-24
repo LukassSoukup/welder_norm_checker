@@ -19,11 +19,16 @@ interface IEmployee {
 }
 
 interface IDailyLog {
-    employeeId: string;
     arrivedToWork: string;
     leftWork: string;
-    workTime?: number;
     productList: object;
+    workTime?: number;
+    recorded?: string;
+}
+
+interface IEmployeesDailyLog {
+    employeeId: string;
+    dailyLog: IDailyLog[]
 }
 
 interface IlistResponse {

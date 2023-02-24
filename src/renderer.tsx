@@ -46,10 +46,10 @@ declare global {
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
-            list: () => object[];
+            list: () => Promise<IlistResponse>;
         };
         DailyLog: {
-            create: (obj: object) => void;
+            add: (obj: object) => void;
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
