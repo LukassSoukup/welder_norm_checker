@@ -15,6 +15,7 @@ import {getMonthDir} from "./file_managament/Utils/calculationHelper";
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -38,7 +39,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //if(isDevelopment) mainWindow.webContents.openDevTools();
   createFilePath(ORDER_FILE_PATH);
   createFilePath(PRODUCT_FILE_PATH);
   createFilePath(EMPLOYEE_FILE_PATH);

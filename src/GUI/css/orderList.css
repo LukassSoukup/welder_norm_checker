@@ -49,3 +49,6 @@
 .order-state.completed {
     color: #00ff00;
 }
+.order-state.completed-open {
+    color: #ffc800;
+}

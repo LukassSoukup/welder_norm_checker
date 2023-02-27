@@ -11,7 +11,7 @@ interface IProduct {
     timeToComplete: string,
     detail?: string;
     amount?: number;
-    originalAmount?: number;
+    amountByOrder?: number;
 }
 
 interface IEmployee {

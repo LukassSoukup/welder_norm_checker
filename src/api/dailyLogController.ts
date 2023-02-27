@@ -1,6 +1,13 @@
 import {dialog, ipcMain} from "electron";
 import Path from "path";
-import {deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
+import {
+    createFile,
+    deleteFile,
+    fileExists,
+    loadFile,
+    loadFiles,
+    updateFile
+} from "../file_managament/Utils/file_manager";
 import {toMillis} from "../shared_resources/timeFormatHelper";
 import {
     calculateNormAccomplishment,
@@ -13,24 +20,33 @@ import {
     validateDailyLogListInput, validateISODateFormatInput
 } from "../file_managament/Utils/inputValidation";
 import {
-    errorLogger, InvalidValueErr, PRODUCT_FILE_PATH,
+    errorLogger, InvalidValueErr, NoRecordForGivenDate, PRODUCT_FILE_PATH,
     ValidationCreateErr,
     ValidationDeleteErr,
     ValidationGetErr,
     ValidationUpdateErr
 } from "../file_managament/constants/file_paths";
+import {createFilePath} from "../file_managament/Utils/file_validator";
 
 const TYPE = "výkazu"
 
 ipcMain.on('addDailyLog', async (event, employeeId: string, moneyEarned: number, dailyLog: IDailyLog, date?: string) => {
     try {
         validateDailyLogAddInput(employeeId, dailyLog);
-        if (date) validateISODateFormatInput(date);
-        dailyLog.workTime = toMillis(dailyLog.leftWork) - toMillis(dailyLog.arrivedToWork);
-        dailyLog.recorded = new Date().toISOString();
+        if (date) {
+            validateISODateFormatInput(date);
+            dailyLog.recorded = date;
+        }else dailyLog.recorded = new Date().toISOString();
+
         const fpath = Path.join(getMonthDir(date), employeeId);
+        if(!await fileExists(fpath)) {
+            createFilePath(getMonthDir(date));
+            await createFile(fpath, {employeeId: employeeId, moneyEarned: 0, dailyLog: []});
+        }
+
         const log: IEmployeesDailyLog = await loadFile(fpath);
-        ensureOneLogPerDay(log.dailyLog, dailyLog.recorded, date);
+        ensureOneLogPerDay(log.dailyLog, dailyLog.recorded);
+        dailyLog.workTime = toMillis(dailyLog.leftWork) - toMillis(dailyLog.arrivedToWork);
         log.dailyLog.push(dailyLog);
         const products: IProduct[] = await loadFiles(Path.join(PRODUCT_FILE_PATH));
 
@@ -58,6 +74,7 @@ ipcMain.handle('getDailyLog', async (event, employeeId: string, recorded: string
         return logs.dailyLog.filter((log: IDailyLog) => new Date(log.recorded).toLocaleDateString() === new Date(recorded).toLocaleDateString())
     } catch (err) {
         errorLogger(err);
+        if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);
         if (err.name === 'invalidISODate') InvalidValueErr(err);
         else ValidationGetErr(TYPE, err, employeeId);
     }
@@ -70,6 +87,7 @@ ipcMain.handle('listLogsByMonthAndEmployee', async (event, employeeId: string, d
         return await loadFile(Path.join(getMonthDir(date), employeeId));
     } catch (err) {
         errorLogger(err);
+        if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);
         if (err.name === 'invalidISODate') InvalidValueErr(err);
         else ValidationGetErr(TYPE, err, employeeId);
     }
@@ -81,6 +99,7 @@ ipcMain.handle('listAllLogsByMonth', async (event, date /*ISOString*/) => {
         return await loadFiles(Path.join(getMonthDir(date)));
     } catch (err) {
         errorLogger(err);
+        if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);
         InvalidValueErr(err);
     }
 });
@@ -96,7 +115,8 @@ ipcMain.on('updateDailyLog', async (event, employeeId: string, recorded: string,
         await updateFile(fpath, oldLog);
     } catch (err) {
         errorLogger(err);
-        if (err.name === 'invalidISODate') InvalidValueErr(err);
+        if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);
+        if (err.name === 'invalidISODate') return InvalidValueErr(err);
         ValidationUpdateErr(TYPE, err, employeeId);
     }
 });
@@ -108,7 +128,8 @@ ipcMain.on('deleteDailyLog', async (event, employeeId: string, date?: string) =>
         await deleteFile(Path.join(getMonthDir(date), employeeId));
     } catch (err) {
         errorLogger(err);
-        if (err.name === 'invalidISODate') InvalidValueErr(err);
+        if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);
+        if (err.name === 'invalidISODate') return InvalidValueErr(err);
         ValidationDeleteErr(TYPE, err, employeeId);
     }
 });

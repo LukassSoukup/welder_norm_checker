@@ -10,10 +10,8 @@ export function getMonthDir(_month?: string) {
     return Path.join(DAILY_LOG_FILE_PATH, path);
 }
 
-export function ensureOneLogPerDay(logs: IDailyLog[], recorded: string, date?: string) {
-    let is;
-    if(date) is = logs?.some(log => new Date(log.recorded).toLocaleDateString() === date);
-    else is = logs?.some(log => new Date(log.recorded).toLocaleDateString() === new Date(recorded).toLocaleDateString());
+export function ensureOneLogPerDay(logs: IDailyLog[], recorded: string) {
+    const is = logs?.some(log => new Date(log.recorded).toLocaleDateString() === new Date(recorded).toLocaleDateString());
     if(is) {
         const e = new Error("Zaměstnanec si může vykázat za den pouze jednou!");
         e.name = "OncePerDayLog";

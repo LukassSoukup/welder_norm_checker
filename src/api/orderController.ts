@@ -62,7 +62,7 @@ export async function listOrders() {
         order.listOfProducts = [];
         for (const articleNum in productAmounts) {
             const product = await loadFile(Path.join(PRODUCT_FILE_PATH, articleNum));
-            order.listOfProducts.push({...product, originalAmount: productAmounts[articleNum]});
+            order.listOfProducts.push({...product, amountByOrder: productAmounts[articleNum]});
         }
         return order;
     }));
@@ -71,6 +71,13 @@ export async function listOrders() {
 export async function updateOrder(event: IpcMainEvent, order: IOrder) {
     try {
         validateOrderGetInput(order.orderNumber);
+        if(Array.isArray(order.listOfProducts)) {
+            const list = order.listOfProducts;
+            order.listOfProducts = {};
+            list.forEach((product: IProduct) => {
+                order.listOfProducts[product.articleNum] = product.amountByOrder;
+            })
+        }
         const fpath = Path.join(ORDER_FILE_PATH, order.orderNumber);
         const oldOrder = await loadFile(fpath);
         await updateFile(fpath, {...oldOrder, ...order});

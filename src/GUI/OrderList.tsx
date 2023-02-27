@@ -1,44 +1,48 @@
 import React, {useEffect, useState} from 'react';
 import "./css/orderList.css";
+import {OrderTile} from "./OrderTile";
 
 export const OrderList = () => {
     const [orderList, setOrderList] = useState<IlistResponse>({});
+    const [totalProductAmount, setTotalProductAmount] = useState<IlistResponse>({});
 
     useEffect(() => {
         window.Order.list().then((data) => {
             console.log(data);
             setOrderList(data);
-        });
-        window.Product.list().then((data) => {
-            console.log(data);
+            getTotalProductAmount(data);
         });
     }, []);
 
+    const onOrderClose = (order: IOrder) => {
+        order.state = true;
+        window.Order.update(order);
+        window.Order.list().then((data) => {
+            setOrderList(data);
+            getTotalProductAmount(data);
+        });
+    }
+
+    const getTotalProductAmount = (_orderList: IlistResponse) => {
+        const _totalProductAmount: IlistResponse = {}
+        _orderList.forEach((order: IOrder) => {
+            if (order.state) return;
+            order.listOfProducts.forEach((product: IProduct) => {
+                if (!_totalProductAmount[product.articleNum]) _totalProductAmount[product.articleNum] = product.amountByOrder;
+                else _totalProductAmount[product.articleNum] += product.amountByOrder;
+            });
+        });
+        setTotalProductAmount(_totalProductAmount);
+    }
 
     return (
         <div>
             <ul className="order-list">
-                {Object.keys(orderList).length > 0 && orderList.map((order: IOrder) => (
-                    <li key={order.orderNumber} className="order-item">
-                        <h2 className="order-number">Zakázka číslo: {order.orderNumber}</h2>
-                        <p className="due-date">Datum dodání: {order.dueDate}</p>
-                        <p className="product-list-header">Produkty: </p>
-                        <ul className="product-list">
-                            {order.listOfProducts.map((product: IProduct) => (
-                                <li key={product.articleNum} className="product-item">
-                                    <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
-                                    <p className="price-per-product">Cena za kus: {product.price},- Kč</p>
-                                    <p className="product-amount">Počet: {product.originalAmount} ks</p>
-                                    <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
-                                    {product.detail && <p className="detail">Popisek: {product.detail}</p>}
-                                </li>
-                            ))}
-                        </ul>
-                        <p className={`order-state ${order.state ? "completed" : "pending"}`}>
-                            {order.state ? "Splněno" : "Probíhá"}
-                        </p>
-                    </li>
-                ))}
+                <ul className="order-list">
+                    {Object.keys(orderList).length > 0 && orderList.map((order: IOrder) => (
+                        <OrderTile order={order} totalProductAmount={totalProductAmount} onOrderClose={onOrderClose}/>
+                    ))}
+                </ul>
             </ul>
         </div>
     );

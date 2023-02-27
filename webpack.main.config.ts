@@ -10,10 +10,14 @@ export const mainConfig: Configuration = {
    * that runs in the main process.
    */
   mode: isDevelopment ? 'development' : 'production',
-  devServer: {
-    client: { overlay: false },
-  },
+  target: 'electron-main',
   entry: './src/index.ts',
+  output: {
+    publicPath: '/',
+  },
+  devServer: {
+    client: { overlay: false }
+  },
   // Put your normal webpack config below here
   module: {
     rules,

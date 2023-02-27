@@ -38,7 +38,7 @@ export const OrderCreateForm = () => {
             </label>
             <br/>
             <label>
-                Dodací lhůta
+                Dodací lhůta:
                 <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)}/>
             </label>
             <br/>
