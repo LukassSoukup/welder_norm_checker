@@ -28,32 +28,34 @@
 declare global {
     interface Window {
         Order: {
-            create: (obj: object) => void;
+            create: (obj: IOrder) => void;
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
             list: () => Promise<IlistResponse>;
         };
         Product: {
-            create: (obj: object) => void;
+            create: (obj: IProduct, byNewOrder?:boolean) => void;
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
-            list: () => object[];
+            list: () => Promise<IProduct[]>;
+            reportError: (id: string) => void;
         };
         Employee: {
-            create: (obj: object) => void;
+            create: (obj: IEmployee) => void;
             update: (obj: object) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
             list: () => Promise<IlistResponse>;
         };
         DailyLog: {
-            add: (obj: object) => void;
-            update: (obj: object) => void;
-            delete: (id: string) => void;
-            get: (id: string) => object;
-            list: (employeeId: string) => object[];
+            add: (employeeId: string, moneyEarned: number, dailyLog: IDailyLog, date?: string) => void;
+            update: (employeeId: string, recorded: string, dailyLog: IDailyLog, date?: string) => void;
+            delete: (employeeId: string, date?: string) => void;
+            get: (employeeId: string, recorded: string, date?: string) => object;
+            listByEmployee: (employeeId: string, date?: string) => object[];
+            listAll: (date: string) => object[];
         };
     }
 }

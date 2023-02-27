@@ -39,6 +39,16 @@ async function loadFile(filePath: string) {
     }
 }
 
+async function fileExists(filePath: string) {
+    filePath += ".json";
+    try {
+        await fs.stat(filePath);
+        return true;
+    } catch (err) {
+        return false
+    }
+}
+
 async function loadFiles(dirPath: string): Promise<any> {
     try {
         const fileNames = await fs.readdir(dirPath);
@@ -48,7 +58,7 @@ async function loadFiles(dirPath: string): Promise<any> {
             content = JSON.parse(content.toString());
             response.push(content);
         }));
-        if(response.length === 0) debugLogger(`No records found at ${dirPath}`);
+        if (response.length === 0) debugLogger(`No records found at ${dirPath}`);
         else infoLogger(`Loading multiple files from ${dirPath}`);
         return response;
     } catch (err) {
@@ -75,4 +85,4 @@ function getFileName(filePath: string): string {
     return fname[fname.length - 1];
 }
 
-export {createFile, loadFile, loadFiles, updateFile, deleteFile}
+export {createFile, loadFile, loadFiles, updateFile, deleteFile, fileExists}

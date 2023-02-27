@@ -20,7 +20,7 @@ ipcMain.on('createEmployee', async (event, employee: IEmployee) => {
         validateEmployeeInput(employee);
         employee.id = randomUUID();
         await createFile(Path.join(EMPLOYEE_FILE_PATH, employee.id), employee);
-        await createFile(Path.join(getMonthDir(), employee.id), {employeeId: employee.id, dailyLog: []});
+        await createFile(Path.join(getMonthDir(), employee.id), {employeeId: employee.id, moneyEarned: 0, dailyLog: []});
     } catch (err) {
         errorLogger(err);
         ValidationCreateErr(TYPE, err, employee.name);

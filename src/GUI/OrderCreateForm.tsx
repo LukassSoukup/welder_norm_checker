@@ -1,33 +1,33 @@
 import React, {useState} from 'react';
 import {ProductCreateForm} from "./ProductCreateForm";
 
-type ProductInOrderType = Record<string, number>;
-
+const defaultDueDate = new Date(Date.now() + 12096e5).toISOString().split('T')[0] // now + 14 days yyyy-mm-dd
 export const OrderCreateForm = () => {
     const [orderNumber, setOrderNumber] = useState('');
-    const [dueDate, setDueDate] = useState('');
-    const [listOfProducts, setListOfProducts] = useState<ProductInOrderType>({});
+    const [dueDate, setDueDate] = useState(defaultDueDate);
+    const [listOfProducts, setListOfProducts] = useState<IProduct[]>([]);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("creating order...");
-        window.Order.create({orderNumber, dueDate, listOfProducts});
+        const productsToSet: IlistResponse = {};
+        listOfProducts.forEach((product: IProduct) => {
+            productsToSet[product.articleNum] = product.amount;
+            window.Product.create(product, true);
+        });
+        window.Order.create({orderNumber, dueDate, listOfProducts: productsToSet, state: false});
         eraseValues();
-        console.log("request submitted");
     };
 
     const eraseValues = () => {
         setOrderNumber('');
-        setDueDate('');
-        setListOfProducts({});
+        setDueDate(defaultDueDate);
+        setListOfProducts([]);
         setShowAddProductForm(false);
     }
 
-    const addProductToOrder = (articleNum: string, amount: number) => {
-        setListOfProducts((prev) => {
-            return {...prev, [articleNum]: amount }
-        });
+    const addProductToOrder = (product: IProduct) => {
+        setListOfProducts((prev) => [...prev, product ]);
     }
 
     return (

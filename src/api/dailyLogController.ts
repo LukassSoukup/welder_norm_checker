@@ -1,14 +1,19 @@
 import {dialog, ipcMain} from "electron";
+import Path from "path";
+import {deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
+import {toMillis} from "../shared_resources/timeFormatHelper";
+import {
+    calculateNormAccomplishment,
+    ensureOneLogPerDay,
+    getMonthDir, handleProductAmountChange,
+} from "../file_managament/Utils/calculationHelper";
 import {
     validateDailyLogAddInput,
     validateDailyLogGetInput,
     validateDailyLogListInput, validateISODateFormatInput
 } from "../file_managament/Utils/inputValidation";
-import {deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
-import {ensureOneLogPerDay, getMonthDir, toMillis} from "../file_managament/Utils/calculationHelper";
-import Path from "path";
 import {
-    errorLogger, InvalidValueErr,
+    errorLogger, InvalidValueErr, PRODUCT_FILE_PATH,
     ValidationCreateErr,
     ValidationDeleteErr,
     ValidationGetErr,
@@ -17,28 +22,39 @@ import {
 
 const TYPE = "výkazu"
 
-ipcMain.on('addDailyLog', async (event, employeeId: string, dailyLog: IDailyLog) => {
+ipcMain.on('addDailyLog', async (event, employeeId: string, moneyEarned: number, dailyLog: IDailyLog, date?: string) => {
     try {
         validateDailyLogAddInput(employeeId, dailyLog);
+        if (date) validateISODateFormatInput(date);
         dailyLog.workTime = toMillis(dailyLog.leftWork) - toMillis(dailyLog.arrivedToWork);
         dailyLog.recorded = new Date().toISOString();
-        const fpath = Path.join(getMonthDir(), employeeId);
-        const log = await loadFile(fpath);
-        ensureOneLogPerDay(log.dailyLogs, dailyLog.recorded);
-        log.dailyLogs.push(dailyLog)
-        await updateFile(Path.join(getMonthDir(), employeeId), log);
+        const fpath = Path.join(getMonthDir(date), employeeId);
+        const log: IEmployeesDailyLog = await loadFile(fpath);
+        ensureOneLogPerDay(log.dailyLog, dailyLog.recorded, date);
+        log.dailyLog.push(dailyLog);
+        const products: IProduct[] = await loadFiles(Path.join(PRODUCT_FILE_PATH));
+
+        const {totalWorkTime, totalProductTime, normAccomplished} = calculateNormAccomplishment(log.dailyLog, products);
+        log.moneyEarned += moneyEarned;
+        log.totalWorkTime = totalWorkTime;
+        log.totalProductTime = totalProductTime;
+        log.normAccomplished = normAccomplished;
+
+        handleProductAmountChange(products, dailyLog.productList)
+        await updateFile(fpath, log);
     } catch (err) {
         errorLogger(err);
         if (err.name === "OncePerDayLog") dialog.showErrorBox(`Tento zaměstnanec má za dnešek již vykázáno.`, err.message);
+        else if (err.name === 'invalidISODate') InvalidValueErr(err);
         else ValidationCreateErr(TYPE, err, employeeId);
     }
 });
 
-ipcMain.handle('getDailyLog', async (event, employeeId: string, recorded: string, date: string) => {
+ipcMain.handle('getDailyLog', async (event, employeeId: string, recorded: string, date?: string) => {
     try {
         validateDailyLogGetInput(employeeId, recorded);
         if (date) validateISODateFormatInput(date);
-        const logs = await loadFile(Path.join(getMonthDir(), employeeId));
+        const logs: IEmployeesDailyLog = await loadFile(Path.join(getMonthDir(date), employeeId));
         return logs.dailyLog.filter((log: IDailyLog) => new Date(log.recorded).toLocaleDateString() === new Date(recorded).toLocaleDateString())
     } catch (err) {
         errorLogger(err);
@@ -47,12 +63,11 @@ ipcMain.handle('getDailyLog', async (event, employeeId: string, recorded: string
     }
 });
 
-ipcMain.handle('listLogsByMonthAndEmployee', async (event, employeeId: string, date: string /*ISOString*/) => {
+ipcMain.handle('listLogsByMonthAndEmployee', async (event, employeeId: string, date?: string /*ISOString*/) => {
     try {
         validateDailyLogListInput(employeeId);
         if (date) validateISODateFormatInput(date);
-        const logs = await loadFile(Path.join(getMonthDir(date), employeeId));
-        return logs.dailyLog;
+        return await loadFile(Path.join(getMonthDir(date), employeeId));
     } catch (err) {
         errorLogger(err);
         if (err.name === 'invalidISODate') InvalidValueErr(err);
@@ -70,7 +85,7 @@ ipcMain.handle('listAllLogsByMonth', async (event, date /*ISOString*/) => {
     }
 });
 
-ipcMain.on('updateDailyLog', async (event, employeeId: string, recorded: string, dailyLog: IDailyLog, date: string) => {
+ipcMain.on('updateDailyLog', async (event, employeeId: string, recorded: string, dailyLog: IDailyLog, date?: string) => {
     try {
         validateDailyLogGetInput(employeeId, recorded);
         if (date) validateISODateFormatInput(date);
@@ -86,14 +101,14 @@ ipcMain.on('updateDailyLog', async (event, employeeId: string, recorded: string,
     }
 });
 
-ipcMain.on('deleteDailyLog', async (event, id, date) => {
+ipcMain.on('deleteDailyLog', async (event, employeeId: string, date?: string) => {
     try {
-        validateDailyLogListInput(id);
+        validateDailyLogListInput(employeeId);
         if (date) validateISODateFormatInput(date);
-        await deleteFile(Path.join(getMonthDir(date), id));
+        await deleteFile(Path.join(getMonthDir(date), employeeId));
     } catch (err) {
         errorLogger(err);
         if (err.name === 'invalidISODate') InvalidValueErr(err);
-        ValidationDeleteErr(TYPE, err, id);
+        ValidationDeleteErr(TYPE, err, employeeId);
     }
 });

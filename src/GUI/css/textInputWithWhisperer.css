@@ -1,0 +1,49 @@
+.textInputWithWhisperer {
+    position: relative;
+    display: inline-block;
+}
+
+.textInputWithWhisperer input[type="text"] {
+    padding-right: 24px;
+}
+
+.textInputWithWhisperer .whispererList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    min-width: 160px;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    list-style: none;
+}
+
+.textInputWithWhisperer .whispererList li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.textInputWithWhisperer .whispererList li:hover {
+    background-color: #f2f2f2;
+}
+
+.textInputWithWhisperer .whispererList li.active {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.textInputWithWhisperer .arrow {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 5px 0 5px;
+    border-color: #4CAF50 transparent transparent transparent;
+}

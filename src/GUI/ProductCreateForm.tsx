@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
 
 type ProductCreateFormProps = {
-    addProductToOrder: (articleNum: string, amount: number) => void;
+    addProductToOrder: (product: IProduct) => void;
 };
+
+const defaultPrice = 1000;
+const defaultAmount = 0;
+const defaultTimeToComplete = "00:30";
 
 export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) => {
     const [articleNum, setArticleNum] = useState('');
-    const [amount, setAmount] = useState(0);
-    const [price, setPrice] = useState(0);
-    const [timeToComplete, setTimeToComplete] = useState("00:30");
+    const [amount, setAmount] = useState(defaultAmount);
+    const [price, setPrice] = useState(defaultPrice);
+    const [timeToComplete, setTimeToComplete] = useState(defaultTimeToComplete);
     const [detail, setDetail] = useState('');
     const eraseValues = () => {
         setArticleNum('');
-        setAmount(0);
-        setPrice(100);
-        setTimeToComplete("00:30");
+        setAmount(defaultAmount);
+        setPrice(defaultPrice);
+        setTimeToComplete(defaultTimeToComplete);
         setDetail('');
     }
 
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        window.Product.create({articleNum, timeToComplete, detail})
-        addProductToOrder(articleNum, amount);
+        addProductToOrder({articleNum, timeToComplete, price, amount, detail});
         eraseValues()
     };
 

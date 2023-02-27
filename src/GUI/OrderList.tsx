@@ -9,6 +9,9 @@ export const OrderList = () => {
             console.log(data);
             setOrderList(data);
         });
+        window.Product.list().then((data) => {
+            console.log(data);
+        });
     }, []);
 
 
@@ -25,7 +28,7 @@ export const OrderList = () => {
                                 <li key={product.articleNum} className="product-item">
                                     <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
                                     <p className="price-per-product">Cena za kus: {product.price},- Kč</p>
-                                    <p className="product-amount">Počet: {product.amount}</p>
+                                    <p className="product-amount">Počet: {product.originalAmount} ks</p>
                                     <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
                                     {product.detail && <p className="detail">Popisek: {product.detail}</p>}
                                 </li>

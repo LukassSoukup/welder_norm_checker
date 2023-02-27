@@ -15,11 +15,12 @@ contextBridge.exposeInMainWorld('Order', {
 });
 
 contextBridge.exposeInMainWorld('Product', {
-    create: (product: object) => ipcRenderer.send('createProduct', product),
+    create: (product: IProduct, byNewOrder?: boolean) => ipcRenderer.send('createProduct', product, byNewOrder),
     update: (product: object) => ipcRenderer.send('updateProduct', product),
     delete: (id: string) => ipcRenderer.send('deleteProduct', id),
     get: (id: string) => ipcRenderer.invoke('getProduct', id),
-    list: () => ipcRenderer.invoke("listProducts")
+    list: () => ipcRenderer.invoke("listProducts"),
+    reportError: (id: string) => ipcRenderer.send("reportError", id)
 });
 
 contextBridge.exposeInMainWorld('Employee', {
@@ -31,10 +32,10 @@ contextBridge.exposeInMainWorld('Employee', {
 });
 
 contextBridge.exposeInMainWorld('DailyLog', {
-    create: (dailyLog: object) => ipcRenderer.send('addDailyLog', dailyLog),
-    update: (dailyLog: object) => ipcRenderer.send('updateDailyLog', dailyLog),
-    delete: (id: string) => ipcRenderer.send('deleteDailyLog', id),
-    get: (id: string) => ipcRenderer.invoke('getDailyLog', id),
-    list: (employeeId: string) => ipcRenderer.invoke("listLogsByMonthAndEmployee", employeeId),
-    listAll: () => ipcRenderer.invoke("listAllLogsByMonth")
+    add: (employeeId: string, moneyEarned:number, dailyLog: IDailyLog, date?: string) => ipcRenderer.send('addDailyLog', employeeId, moneyEarned, dailyLog, date),
+    update: (employeeId: string, recorded: string, dailyLog: IDailyLog, date?: string) => ipcRenderer.send('updateDailyLog',employeeId, recorded, dailyLog, date),
+    delete: (employeeId: string, date?: string) => ipcRenderer.send('deleteDailyLog', employeeId, date),
+    get: (employeeId: string, recorded: string, date?: string) => ipcRenderer.invoke('getDailyLog', employeeId, recorded, date),
+    listByEmployee: (employeeId: string, date?: string) => ipcRenderer.invoke("listLogsByMonthAndEmployee", employeeId, date),
+    listAll: (date: string) => ipcRenderer.invoke("listAllLogsByMonth", date)
 });

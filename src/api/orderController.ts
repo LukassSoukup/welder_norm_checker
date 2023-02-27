@@ -1,4 +1,4 @@
-import {ipcMain} from "electron";
+import {ipcMain, IpcMainEvent} from "electron";
 import {validateOrderCreateInput, validateOrderGetInput} from "../file_managament/Utils/inputValidation";
 import {createFile, deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
 import Path from "path";
@@ -38,28 +38,11 @@ ipcMain.handle('getOrder', async (event, orderNumber) => {
 });
 
 ipcMain.handle('listOrders', async () => {
-    const orderList = await loadFiles(Path.join(ORDER_FILE_PATH));
-    return await Promise.all(orderList.map(async (order: IOrder) => {
-        const productAmounts = order.listOfProducts;
-        order.listOfProducts = [];
-        for (const articleNum in productAmounts) {
-            const product = await loadFile(Path.join(PRODUCT_FILE_PATH, articleNum));
-            order.listOfProducts.push({...product, amount: productAmounts[articleNum]});
-        }
-        return order;
-    }));
+    return await listOrders();
 });
 
 ipcMain.on('updateOrder', async (event, order) => {
-    try {
-        validateOrderGetInput(order.orderNumber);
-        const fpath = Path.join(ORDER_FILE_PATH, order.orderNumber);
-        const oldOrder = await loadFile(fpath);
-        await updateFile(fpath, {...oldOrder, ...order});
-    } catch (err) {
-        errorLogger(err);
-        ValidationGetErr(TYPE, err, order.orderNumber);
-    }
+    await updateOrder(event, order);
 });
 
 ipcMain.on('deleteOrder', async (event, orderNumber) => {
@@ -71,3 +54,28 @@ ipcMain.on('deleteOrder', async (event, orderNumber) => {
         ValidationDeleteErr(TYPE, err, orderNumber);
     }
 });
+
+export async function listOrders() {
+    const orderList = await loadFiles(Path.join(ORDER_FILE_PATH));
+    return Promise.all(orderList.map(async (order: IOrder) => {
+        const productAmounts = order.listOfProducts;
+        order.listOfProducts = [];
+        for (const articleNum in productAmounts) {
+            const product = await loadFile(Path.join(PRODUCT_FILE_PATH, articleNum));
+            order.listOfProducts.push({...product, originalAmount: productAmounts[articleNum]});
+        }
+        return order;
+    }));
+}
+
+export async function updateOrder(event: IpcMainEvent, order: IOrder) {
+    try {
+        validateOrderGetInput(order.orderNumber);
+        const fpath = Path.join(ORDER_FILE_PATH, order.orderNumber);
+        const oldOrder = await loadFile(fpath);
+        await updateFile(fpath, {...oldOrder, ...order});
+    } catch (err) {
+        errorLogger(err);
+        ValidationGetErr(TYPE, err, order.orderNumber);
+    }
+}

@@ -1,7 +1,7 @@
 interface IOrder {
     orderNumber: string,
     dueDate: string,
-    listOfProducts: IProduct[],
+    listOfProducts: IlistResponse,
     state: boolean
 }
 
@@ -10,7 +10,8 @@ interface IProduct {
     price: number;
     timeToComplete: string,
     detail?: string;
-    amount?: number
+    amount?: number;
+    originalAmount?: number;
 }
 
 interface IEmployee {
@@ -21,14 +22,23 @@ interface IEmployee {
 interface IDailyLog {
     arrivedToWork: string;
     leftWork: string;
-    productList: object;
+    normAccomplished: boolean;
+    productList: IlistResponse;
     workTime?: number;
     recorded?: string;
 }
 
 interface IEmployeesDailyLog {
     employeeId: string;
+    moneyEarned: number;
+    normAccomplished: boolean;
+    totalWorkTime: number;
+    totalProductTime: number;
     dailyLog: IDailyLog[]
+}
+
+interface IProductAmountList {
+    [productId: string]: number;
 }
 
 interface IlistResponse {

@@ -2,6 +2,7 @@ import { app, BrowserWindow, screen  } from 'electron';
 import "./api/orderController";
 import "./api/productController";
 import "./api/employeeController";
+import "./api/dailyLogController";
 import {createFilePath} from "./file_managament/Utils/file_validator";
 import {
   EMPLOYEE_FILE_PATH,
@@ -26,8 +27,8 @@ const createWindow = (): void => {
   const { width, height } = primaryDisplay.workAreaSize
 
   const mainWindow = new BrowserWindow({
-    height: height-100,
-    width: width-300,
+    height: height-200,
+    width: width-400,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
