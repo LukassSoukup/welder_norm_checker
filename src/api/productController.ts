@@ -50,7 +50,7 @@ ipcMain.handle('getProduct', async (event, articleNum) => {
     }
 });
 
-ipcMain.handle('listProducts', async () => {
+ipcMain.handle('listProducts', async (): Promise<IProduct[]> => {
     return await loadFiles(Path.join(PRODUCT_FILE_PATH));
 });
 

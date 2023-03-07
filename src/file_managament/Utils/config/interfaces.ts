@@ -16,6 +16,7 @@ interface IProduct {
 
 interface IEmployee {
     name: string;
+    hourlyRate: number;
     id?: string;
 }
 
@@ -43,4 +44,19 @@ interface IProductAmountList {
 
 interface IlistResponse {
     [key: string]: any;
+}
+
+interface ICurrencyAPIResponse {
+    "date": string,
+    "info": {
+    "rate": number,
+        "timestamp": number
+},
+    "query": {
+    "amount": number,
+        "from": string,
+        "to": string
+},
+    "result": number,
+    "success": boolean
 }

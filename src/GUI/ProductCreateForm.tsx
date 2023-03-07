@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 type ProductCreateFormProps = {
-    addProductToOrder: (product: IProduct) => void;
+    addProductToOrder?: (product: IProduct) => void;
 };
 
 const defaultPrice = 1000;
@@ -24,7 +24,8 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
 
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        addProductToOrder({articleNum, timeToComplete, price, amount, detail});
+        if(typeof addProductToOrder === "function") addProductToOrder({articleNum, timeToComplete, price, amount, detail});
+        else window.Product.create({articleNum, timeToComplete, price, amount, detail});
         eraseValues()
     };
 

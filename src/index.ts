@@ -39,7 +39,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  //if(isDevelopment) mainWindow.webContents.openDevTools();
+  if(isDevelopment) mainWindow.webContents.openDevTools();
   createFilePath(ORDER_FILE_PATH);
   createFilePath(PRODUCT_FILE_PATH);
   createFilePath(EMPLOYEE_FILE_PATH);

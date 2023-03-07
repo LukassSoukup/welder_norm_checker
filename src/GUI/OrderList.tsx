@@ -38,11 +38,9 @@ export const OrderList = () => {
     return (
         <div>
             <ul className="order-list">
-                <ul className="order-list">
-                    {Object.keys(orderList).length > 0 && orderList.map((order: IOrder) => (
-                        <OrderTile order={order} totalProductAmount={totalProductAmount} onOrderClose={onOrderClose}/>
-                    ))}
-                </ul>
+                {Object.keys(orderList).length > 0 && orderList.map((order: IOrder) => (
+                    <OrderTile order={order} totalProductAmount={totalProductAmount} onOrderClose={onOrderClose}/>
+                ))}
             </ul>
         </div>
     );

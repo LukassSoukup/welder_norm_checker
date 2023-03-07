@@ -21,6 +21,7 @@ export function validateProductGetInput(articleNum: string): void {
 
 export function validateEmployeeInput(obj: IEmployee): void {
     if(!obj.name) throw isRequiredButMissingErr("Employee.name");
+    if(!obj.hourlyRate) throw isRequiredButMissingErr("Employee.hourlyRate");
 }
 export function validateEmployeeGetInput(id: string): void {
     if(!id) throw isRequiredButMissingErr("Employee.id");

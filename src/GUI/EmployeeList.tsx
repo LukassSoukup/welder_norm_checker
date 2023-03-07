@@ -27,7 +27,10 @@ export const EmployeeList = () => {
             <ul className="employee-list">
                 {Object.keys(employeeList).length > 0 && employeeList.map((employee: IEmployee) => (
                     <li key={employee.id} className="employee-item">
-                        <h2 className="employee-number">{employee.name}</h2>
+                        <div>
+                            <h2 className="employee-number">{employee.name}</h2>
+                            <i>{employee.hourlyRate},- Kč/h</i>
+                        </div>
                         <label>
                             <button
                                 onClick={() => isActiveEmployee(employee.id) ? closeCreateMenu() : openCreateMenu(employee.id)}>{isActiveEmployee(employee.id) ? "Zavřít" : "Vykázat práci"}</button>
