@@ -8,8 +8,8 @@ import {
     loadFiles,
     updateFile
 } from "../file_managament/Utils/file_manager";
-import {toMillis} from "../shared_resources/timeFormatHelper";
 import {
+    calculateMoneyEarnedAndNormTime,
     calculateNormAccomplishment,
     ensureOneLogPerDay,
     getMonthDir, handleProductAmountChange,
@@ -30,31 +30,37 @@ import {createFilePath} from "../file_managament/Utils/file_validator";
 
 const TYPE = "výkazu"
 
-ipcMain.on('addDailyLog', async (event, employeeId: string, moneyEarned: number, dailyLog: IDailyLog, date?: string) => {
+ipcMain.on('addDailyLog', async (event, employee: IEmployee, dailyLog: IDailyLog, date?: string) => {
     try {
-        validateDailyLogAddInput(employeeId, dailyLog);
+        validateDailyLogAddInput(employee, dailyLog);
         if (date) {
             validateISODateFormatInput(date);
             dailyLog.recorded = date;
         }else dailyLog.recorded = new Date().toISOString();
 
-        const fpath = Path.join(getMonthDir(date), employeeId);
+        const fpath = Path.join(getMonthDir(date), employee.id);
         if(!await fileExists(fpath)) {
             createFilePath(getMonthDir(date));
-            await createFile(fpath, {employeeId: employeeId, moneyEarned: 0, dailyLog: []});
+            await createFile(fpath, {employeeId: employee.id, moneyEarned: 0, dailyLog: []});
         }
 
         const log: IEmployeesDailyLog = await loadFile(fpath);
         ensureOneLogPerDay(log.dailyLog, dailyLog.recorded);
-        dailyLog.workTime = toMillis(dailyLog.leftWork) - toMillis(dailyLog.arrivedToWork);
+        dailyLog.workTime -=  30 * 60 * 1000; // Lunch break
+        const dailyStats = calculateMoneyEarnedAndNormTime(dailyLog.workTime, dailyLog.productTime, employee.hourlyRate);
+        dailyLog.normAccomplished = dailyLog.workTime <= dailyLog.productTime;
+        dailyLog.normTime = dailyStats.totalNormTime;
+        dailyLog.moneyEarned = dailyStats.moneyEarned;
         log.dailyLog.push(dailyLog);
         const products: IProduct[] = await loadFiles(Path.join(PRODUCT_FILE_PATH));
 
         const {totalWorkTime, totalProductTime, normAccomplished} = calculateNormAccomplishment(log.dailyLog, products);
+        const {moneyEarned, totalNormTime} = calculateMoneyEarnedAndNormTime(totalWorkTime, totalProductTime, employee.hourlyRate);
         log.moneyEarned += moneyEarned;
         log.totalWorkTime = totalWorkTime;
         log.totalProductTime = totalProductTime;
         log.normAccomplished = normAccomplished;
+        log.totalNormTime = totalNormTime;
 
         handleProductAmountChange(products, dailyLog.productList)
         await updateFile(fpath, log);
@@ -62,7 +68,7 @@ ipcMain.on('addDailyLog', async (event, employeeId: string, moneyEarned: number,
         errorLogger(err);
         if (err.name === "OncePerDayLog") dialog.showErrorBox(`Tento zaměstnanec má za dnešek již vykázáno.`, err.message);
         else if (err.name === 'invalidISODate') InvalidValueErr(err);
-        else ValidationCreateErr(TYPE, err, employeeId);
+        else ValidationCreateErr(TYPE, err, employee.id);
     }
 });
 

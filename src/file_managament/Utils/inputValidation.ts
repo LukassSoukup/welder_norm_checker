@@ -27,10 +27,11 @@ export function validateEmployeeGetInput(id: string): void {
     if(!id) throw isRequiredButMissingErr("Employee.id");
 }
 
-export function validateDailyLogAddInput(employeeId:string, obj: IDailyLog): void {
-    if(!employeeId) throw isRequiredButMissingErr("employeeId");
-    if(!obj.arrivedToWork) throw isRequiredButMissingErr("DailyLog.arrivedToWork");
-    if(!obj.leftWork) throw isRequiredButMissingErr("DailyLog.leftWork");
+export function validateDailyLogAddInput(employee: IEmployee, obj: IDailyLog): void {
+    if(!employee.id) throw isRequiredButMissingErr("employeeId");
+    if(!employee.hourlyRate) throw isRequiredButMissingErr("employee.hourlyRate");
+    if(!obj.workTime) throw isRequiredButMissingErr("DailyLog.workTime");
+    if(!obj.productTime) throw isRequiredButMissingErr("DailyLog.productTime");
     if(!obj.productList) throw isRequiredButMissingErr("DailyLog.productList");
 }
 

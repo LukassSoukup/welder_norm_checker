@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import "./css/employeeCreateForm.css";
+import "./css/general.css";
 
 export const EmployeeCreateForm = () => {
     const [employeeName, setEmployeeName] = useState('');
@@ -12,21 +14,22 @@ export const EmployeeCreateForm = () => {
 
     const eraseValues = () => {
         setEmployeeName('');
+        setHourlyRate(0);
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
+        <form className="employee-create-form" onSubmit={handleSubmit}>
+            <label className="employee-name">
                 Jméno nového zaměstnance:
-                <input type="text" value={employeeName} onChange={event => setEmployeeName(event.target.value)}/>
+                <input className="employee-name-input" type="text" value={employeeName} onChange={event => setEmployeeName(event.target.value)} required={true}/>
             </label>
             <br/>
-            <label>
+            <label className="hourly-rate">
                 výdělek za hodinu práce:
-                <input type="number" value={hourlyRate} onChange={event => setHourlyRate(Number(event.target.value))}/>
+                <input className="hourly-rate-input" min="0" type="number" value={hourlyRate? hourlyRate : ''} onChange={event => setHourlyRate(Number(event.target.value))} required={true}/>
             </label>
             <br/>
-            <button type="submit" disabled={!employeeName}>Přidat nového zaměstnance</button>
+            <button className="send-btn" type="submit" disabled={!employeeName}>Přidat nového zaměstnance</button>
         </form>
     );
 };

@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import TextInputWithWhisperer from "./TextInputWithWhisperer";
 import {toMillis} from "../shared_resources/timeFormatHelper";
+import "./css/dailyLogCreateForm.css";
+import "./css/general.css";
 
 const defaultArrivedToWork = '07:00'
 const defaultLeftWork = '17:00'
@@ -9,41 +11,26 @@ export const DailyLogCreateForm = ({employee}: { employee: IEmployee }) => {
     const [arrivedToWork, SetArrivedToWork] = useState(defaultArrivedToWork);
     const [leftWork, setLeftWork] = useState(defaultLeftWork);
     const [amountDone, setAmountDone] = useState<amountDoneByProduct>({});
-    const [productListAll, setProductListAll] = useState<IProduct[]>([]);
     const [selectedProductList, setSelectedProductList] = useState<IProduct[]>([]);
     const [date, setDate] = useState(''); // if set, has to be ISO format
 
-    useEffect(() => {
-        window.Product.list().then((data) => {
-            console.log(data);
-            setProductListAll(data);
-        });
-    }, [])
-
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         const productsToSet: IlistResponse = {};
-        let moneyEarned = 0;
-        const workTime = toMillis(leftWork) - toMillis(arrivedToWork) - 30 * 60 * 1000;
+        const workTime = toMillis(leftWork) - toMillis(arrivedToWork);
         let productTime = 0
         event.preventDefault();
         selectedProductList.forEach((product: IProduct) => {
             productsToSet[product.articleNum] = amountDone[product.articleNum];
-            moneyEarned += product.price * amountDone[product.articleNum];
-            productTime += toMillis(product.timeToComplete);
-            if (product.amount < 0) window.Product.reportError(product.articleNum);
-            else window.Product.update(product);
+            productTime += toMillis(product.timeToComplete) * amountDone[product.articleNum];
         });
-        const normAccomplished = workTime <= productTime;
-        if (date) window.DailyLog.add(employee.id, moneyEarned, {
-            arrivedToWork,
-            leftWork,
-            normAccomplished,
+        if (date) window.DailyLog.add(employee, {
+            workTime,
+            productTime,
             productList: productsToSet
         }, new Date(date).toISOString());
-        else window.DailyLog.add(employee.id, moneyEarned, {
-            arrivedToWork,
-            leftWork,
-            normAccomplished,
+        else window.DailyLog.add(employee, {
+            workTime,
+            productTime,
             productList: productsToSet
         });
         eraseValues();
@@ -54,36 +41,47 @@ export const DailyLogCreateForm = ({employee}: { employee: IEmployee }) => {
         setLeftWork(defaultLeftWork);
         setSelectedProductList([]);
         setDate('');
-        setProductListAll([]);
+        setAmountDone({});
+    }
+
+    const validateArrivedToWork = (value: string) => {
+        if(toMillis(leftWork) > toMillis(value)){
+            SetArrivedToWork(value);
+        }else alert("Příchod musí být dřív než odchod!");
+    }
+    const validateLeftWork = (value: string) => {
+        if(toMillis(arrivedToWork) > toMillis(value)){
+            setLeftWork(value);
+        }else alert("Příchod musí být dřív než odchod!");
     }
     return (
-        <form onSubmit={handleSubmit}>
-            <i>Výkaz pro: </i>
-            <h2>{employee.name}</h2>
-            <label>
-                Zpětně vykázat:
-                <input type="date" value={date} onChange={event => setDate(event.target.value)}/>
-            </label>
+        <form className="daily-log-create-form" onSubmit={handleSubmit}>
+            <i className="log-for">Výkaz pro</i> <b>{employee.name}</b>
             <br/>
-            <label>
+            <br/>
+            <label className="arrived-to-work">
                 Příchod:
-                <input type="time" value={arrivedToWork} onChange={event => SetArrivedToWork(event.target.value)}
+                <input className="arrived-to-work-input" type="time" value={arrivedToWork} onChange={event => validateArrivedToWork(event.target.value)}
                        required={true}/>
             </label>
             <br/>
-            <label>
+            <label className="left-work">
                 Odchod:
-                <input type="time" value={leftWork} onChange={event => setLeftWork(event.target.value)}
+                <input className="left-work-input" type="time" value={leftWork} onChange={event => validateLeftWork(event.target.value)}
                        required={true}/>
             </label>
             <br/>
             <div id={"product-inputs"}>
                 <TextInputWithWhisperer amountDone={amountDone} setAmountDone={setAmountDone}
-                                        productListAll={productListAll}
                                         setSelectedProductList={setSelectedProductList}/>
             </div>
             <br/>
-            <button type="submit">Vykázat</button>
+            <label className="log-date">
+                Zpětně vykázat:
+                <input className="log-date-input" type="date" value={date} onChange={event => setDate(event.target.value)}/>
+            </label>
+            <br/>
+            <button className="send-btn" type="submit">Vykázat</button>
         </form>
     );
 };

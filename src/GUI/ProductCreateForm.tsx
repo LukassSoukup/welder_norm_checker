@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-
+import "./css/general.css";
+import "./css/productCreateForm.css";
 type ProductCreateFormProps = {
     addProductToOrder?: (product: IProduct) => void;
 };
 
-const defaultPrice = 1000;
+const defaultPrice = 0;
 const defaultAmount = 0;
 const defaultTimeToComplete = "00:30";
 
@@ -22,7 +23,7 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
         setDetail('');
     }
 
-    const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const handleSubmit = (event: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
         event.preventDefault();
         if(typeof addProductToOrder === "function") addProductToOrder({articleNum, timeToComplete, price, amount, detail});
         else window.Product.create({articleNum, timeToComplete, price, amount, detail});
@@ -30,32 +31,33 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
     };
 
     return (
-        <div>
-            <label>
+        <form onSubmit={handleSubmit}>
+            <label className="article-num">
                 Artikel-Nr.:
-                <input type="text" value={articleNum} onChange={event => setArticleNum(event.target.value)} required/>
+                <input className="article-num-input" type="text" value={articleNum} onChange={event => setArticleNum(event.target.value)} required/>
             </label>
             <br />
-            <label>
+            <label className="price">
                 Cena za kus:
-                <input type="number" value={price} onChange={event => setPrice(Number(event.target.value))} required/>Kč
+                <input className="price-input" min="0" placeholder="Kč" type="number" value={price ? price : ''} onChange={event => setPrice(Number(event.target.value))} required/>
             </label>
             <br />
-            <label>
-                Počet:
-                <input type="number" value={amount} onChange={event => setAmount(Number(event.target.value))} required/>
+            <label className="amount">
+                Počet <i className="amount-desc">(počet těchto produktů bude veden mimo objednávky)</i>:
+                <br />
+                <input className="amount-input" min="0" type="number" value={amount ? amount : ''} onChange={event => setAmount(Number(event.target.value))}/>
             </label>
             <br />
-            <label>
+            <label className="time-to-complete">
                 Čas na zpracování:
-                <input type="time" value={timeToComplete} onChange={event => setTimeToComplete(event.target.value)} required/>
+                <input className="time-to-complete-input" type="time" value={timeToComplete} onChange={event => setTimeToComplete(event.target.value)} required/>
             </label>
             <br />
-            <label>
+            <label className="description">
                 Poznámka:
-                <input type="text" value={detail} onChange={event => setDetail(event.target.value)} />
+                <input className="description-input" type="text" value={detail} onChange={event => setDetail(event.target.value)} />
             </label>
-            <button onClick={(e) => handleSubmit(e)} type="submit">Přidat</button>
-        </div>
+            <button className="send-btn" type="submit">Přidat</button>
+        </form>
     )
 }

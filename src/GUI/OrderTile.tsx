@@ -5,7 +5,7 @@ export const OrderTile = ({order, totalProductAmount, onOrderClose}: { order: IO
     const [canBeClosed, setCanBeClosed] = useState(false);
     const [isClosed, setIsClosed] = useState(false);
     useEffect(() => {
-        canBeClosedFn();
+        if(!order.state) canBeClosedFn();
         setIsClosed(order.state);
     },[]);
     const canBeClosedFn = () => {

@@ -42,7 +42,17 @@ export function calculateNormAccomplishment(dailyLogs: IDailyLog[], products: IP
             totalProductTime += (toMillis(product.timeToComplete) * productAmountList[product.articleNum]);
         }
     });
+
     return {totalWorkTime, totalProductTime, normAccomplished: totalWorkTime <= totalProductTime};
+}
+
+export function calculateMoneyEarnedAndNormTime(totalWorkTime: number, totalProductTime: number, hourlyRate: number) {
+    const hour = 1000 * 60 * 60;
+    const totalHourWorkTime = totalWorkTime / hour;
+    const totalNormTime = totalProductTime - totalWorkTime;
+    const moneyEarned = totalHourWorkTime * hourlyRate;
+
+    return {totalNormTime, moneyEarned};
 }
 
 export function handleProductAmountChange(products: IProduct[], productAmountList: IProductAmountList) {

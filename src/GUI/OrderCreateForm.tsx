@@ -1,19 +1,26 @@
 import React, {useState} from 'react';
-import {ProductCreateForm} from "./ProductCreateForm";
+import TextInputWithWhisperer from "./TextInputWithWhisperer";
+import "./css/orderCreateForm.css";
+import "./css/general.css";
 
+type amountDoneByProduct = { [articleNum: string]: number }
 const defaultDueDate = new Date(Date.now() + 12096e5).toISOString().split('T')[0] // now + 14 days yyyy-mm-dd
 export const OrderCreateForm = () => {
     const [orderNumber, setOrderNumber] = useState('');
     const [dueDate, setDueDate] = useState(defaultDueDate);
-    const [listOfProducts, setListOfProducts] = useState<IProduct[]>([]);
-    const [showAddProductForm, setShowAddProductForm] = useState(false);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const [amountDone, setAmountDone] = useState<amountDoneByProduct>({});
+    const [selectedProductList, setSelectedProductList] = useState<IProduct[]>([]);
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        const orderExists = await window.Order.exists(orderNumber);
+        if (orderExists) return alert(`Objednávka číslo ${orderNumber} již existuje! Nelze ji vytvořit znovu.`);
         event.preventDefault();
         const productsToSet: IlistResponse = {};
-        listOfProducts.forEach((product: IProduct) => {
-            productsToSet[product.articleNum] = product.amount;
-            window.Product.create(product, true);
+        console.log(amountDone);
+        selectedProductList.forEach((product: IProduct) => {
+            productsToSet[product.articleNum] = amountDone[product.articleNum];
+            product.amount += amountDone[product.articleNum];
+            console.log(product);
+            window.Product.update(product);
         });
         window.Order.create({orderNumber, dueDate, listOfProducts: productsToSet, state: false});
         eraseValues();
@@ -22,33 +29,28 @@ export const OrderCreateForm = () => {
     const eraseValues = () => {
         setOrderNumber('');
         setDueDate(defaultDueDate);
-        setListOfProducts([]);
-        setShowAddProductForm(false);
-    }
-
-    const addProductToOrder = (product: IProduct) => {
-        setListOfProducts((prev) => [...prev, product ]);
+        setSelectedProductList([]);
+        setAmountDone({});
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
+        <form className="order-create-form" onSubmit={handleSubmit}>
+            <label className="order-number">
                 Číslo zakázky:
-                <input type="text" value={orderNumber} onChange={event => setOrderNumber(event.target.value)}/>
+                <input className="order-number-input" type="text" value={orderNumber} onChange={event => setOrderNumber(event.target.value)}/>
             </label>
             <br/>
-            <label>
+            <label className="due-date">
                 Dodací lhůta:
-                <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)}/>
+                <input className="due-date-input" type="date" value={dueDate} onChange={event => setDueDate(event.target.value)}/>
             </label>
             <br/>
-            <label>
-                {!showAddProductForm ? "Přidat produkt" : "Zavřít"}
-                <input type="checkbox" onChange={() => setShowAddProductForm((prev) => !prev)}/>
-            </label>
-            {showAddProductForm ? <ProductCreateForm addProductToOrder={addProductToOrder} /> : null}
+            <div className={"product-inputs"}>
+                <TextInputWithWhisperer amountDone={amountDone} setAmountDone={setAmountDone}
+                                        setSelectedProductList={setSelectedProductList} forOrder={true}/>
+            </div>
             <br/>
-            <button type="submit" disabled={Object.keys(listOfProducts).length === 0}>Založit objednávku</button>
+            <button className="send-btn" type="submit" disabled={Object.keys(selectedProductList).length === 0}>Založit objednávku</button>
         </form>
     );
 };

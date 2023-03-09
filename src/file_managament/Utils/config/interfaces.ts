@@ -21,11 +21,12 @@ interface IEmployee {
 }
 
 interface IDailyLog {
-    arrivedToWork: string;
-    leftWork: string;
-    normAccomplished: boolean;
+    normAccomplished?: boolean;
     productList: IlistResponse;
-    workTime?: number;
+    workTime: number;
+    productTime: number;
+    normTime?: number;
+    moneyEarned?: number;
     recorded?: string;
 }
 
@@ -33,6 +34,7 @@ interface IEmployeesDailyLog {
     employeeId: string;
     moneyEarned: number;
     normAccomplished: boolean;
+    totalNormTime: number;
     totalWorkTime: number;
     totalProductTime: number;
     dailyLog: IDailyLog[]

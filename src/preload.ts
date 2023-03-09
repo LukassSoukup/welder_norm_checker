@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('Order', {
     update: (order: object) => ipcRenderer.send('updateOrder', order),
     delete: (id: string) => ipcRenderer.send('deleteOrder', id),
     get: (id: string) => ipcRenderer.invoke('getOrder', id),
-    list: () => ipcRenderer.invoke("listOrders")
+    list: () => ipcRenderer.invoke("listOrders"),
+    exists: (id: string) => ipcRenderer.invoke("orderExists", id)
 });
 
 contextBridge.exposeInMainWorld('Product', {
@@ -20,7 +21,8 @@ contextBridge.exposeInMainWorld('Product', {
     delete: (id: string) => ipcRenderer.send('deleteProduct', id),
     get: (id: string) => ipcRenderer.invoke('getProduct', id),
     list: () => ipcRenderer.invoke("listProducts"),
-    reportError: (id: string) => ipcRenderer.send("reportError", id)
+    reportError: (id: string) => ipcRenderer.send("reportError", id),
+    exists: (id: string) => ipcRenderer.invoke("productExists", id)
 });
 
 contextBridge.exposeInMainWorld('Employee', {
@@ -32,7 +34,7 @@ contextBridge.exposeInMainWorld('Employee', {
 });
 
 contextBridge.exposeInMainWorld('DailyLog', {
-    add: (employeeId: string, moneyEarned:number, dailyLog: IDailyLog, date?: string) => ipcRenderer.send('addDailyLog', employeeId, moneyEarned, dailyLog, date),
+    add: (employee: IEmployee, dailyLog: IDailyLog, date?: string) => ipcRenderer.send('addDailyLog', employee, dailyLog, date),
     update: (employeeId: string, recorded: string, dailyLog: IDailyLog, date?: string) => ipcRenderer.send('updateDailyLog',employeeId, recorded, dailyLog, date),
     delete: (employeeId: string, date?: string) => ipcRenderer.send('deleteDailyLog', employeeId, date),
     get: (employeeId: string, recorded: string, date?: string) => ipcRenderer.invoke('getDailyLog', employeeId, recorded, date),

@@ -7,8 +7,8 @@ type amountDoneByProduct = { [articleNum: string]: number }
 type TextInputWithWhispererProps = {
     setAmountDone: React.Dispatch<React.SetStateAction<amountDoneByProduct>>;
     amountDone: amountDoneByProduct;
-    productListAll: IProduct[];
     setSelectedProductList: React.Dispatch<React.SetStateAction<IProduct[]>>;
+    forOrder?: boolean;
 };
 type TextInputWithWhispererState = {
     inputValue: IProduct;
@@ -19,8 +19,8 @@ type TextInputWithWhispererState = {
 function TextInputWithWhisperer({
                                     amountDone,
                                     setAmountDone,
-                                    productListAll,
-                                    setSelectedProductList
+                                    setSelectedProductList,
+                                    forOrder
                                 }: TextInputWithWhispererProps) {
     // Define the component's state
     const initialState = {
@@ -31,6 +31,19 @@ function TextInputWithWhisperer({
     const componentRef = useRef<HTMLDivElement>(null);
     const [productSelected, setProductSelected] = useState(false);
     const [state, setState] = useState<TextInputWithWhispererState>(initialState);
+    const [productListAll, setProductListAll] = useState<IProduct[]>([]);
+    const [localAmountDone, setLocalAmountDone] = useState<amountDoneByProduct>({});
+
+    // Filter the products array based on the input value
+    const filteredProducts = productListAll.filter((product) =>
+        product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && ((product.amount > 0 && !amountDone[product.articleNum]) || forOrder)
+    );
+    useEffect(() => {
+        window.Product.list().then((data) => {
+            console.log(data);
+            setProductListAll(data);
+        });
+    }, [])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -56,7 +69,6 @@ function TextInputWithWhisperer({
     // Define the function to handle a whisperer suggestion being clicked
     const handleWhispererClick = (value: IProduct) => {
         setProductSelected(true);
-        setSelectedProductList(prev => [...prev, value]);
         setState({inputValue: value, showWhisperer: false, activeIndex: -1});
     };
     // Define the function to handle keydown events on the input
@@ -77,15 +89,10 @@ function TextInputWithWhisperer({
             }
         }
     };
-    // Filter the products array based on the input value
-
-    const filteredProducts = productListAll.filter((product) =>
-        product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && product.amount > 0 && !amountDone[product.articleNum]
-    );
 
     function handleAmountChange(event: React.ChangeEvent<HTMLInputElement>) {
         const value = event.target.value || ''
-        setAmountDone((prev) => ({
+        setLocalAmountDone((prev) => ({
             ...prev,
             [state.inputValue.articleNum]: Number(value)
         }))
@@ -94,6 +101,11 @@ function TextInputWithWhisperer({
     function onConfirmBtnClick() {
         setState(initialState);
         setProductSelected(false);
+        setSelectedProductList(prev => [...prev, state.inputValue]);
+        setAmountDone((prev) => ({
+            ...prev,
+            [state.inputValue.articleNum]: localAmountDone[state.inputValue.articleNum]
+        }))
     }
 
     return (
@@ -123,10 +135,11 @@ function TextInputWithWhisperer({
             </div>
             {productSelected &&
                 <>
-                <input placeholder="Počet zpracovaných kusů" type="number" max={state.inputValue.amount} min={0}
-                       value={amountDone[state.inputValue.articleNum]}
-                       onChange={event => handleAmountChange(event)}/>
-                <button onClick={onConfirmBtnClick}>Potvrdit</button>
+                    <input placeholder="Počet kusů" type="number"
+                           max={forOrder ? Infinity : state.inputValue.amount} min={0}
+                           value={localAmountDone[state.inputValue.articleNum] ? localAmountDone[state.inputValue.articleNum] : ''}
+                           onChange={event => handleAmountChange(event)}/>
+                    <button onClick={onConfirmBtnClick}>Potvrdit</button>
                 </>
             }
         </>

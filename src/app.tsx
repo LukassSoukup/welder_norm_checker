@@ -6,7 +6,7 @@ import {EmployeeCreateForm} from "./GUI/EmployeeCreateForm";
 import {ProductCreateForm} from "./GUI/ProductCreateForm";
 import {ProductList} from "./GUI/ProductList";
 import {DEFAULT_COMPANY_HOURLY_RATE} from "./file_managament/constants/currency";
-
+import "./GUI/css/app.css";
 const App = () => {
     const [activeComponent, setActiveComponent] = useState(null);
     const createEmployee = "createEmployee"
@@ -56,13 +56,13 @@ const App = () => {
     }
 
     return (
-        <div>
-            <button onClick={() => isThisActiveComponent(createEmployee) ? closeComponent() : openComponent(createEmployee)}>{isThisActiveComponent(createEmployee) ? "zavřít" : "Vytvořit zaměstnance"}</button>
-            <button onClick={() => isThisActiveComponent(listEmployees) ? closeComponent() : openComponent(listEmployees)}>{isThisActiveComponent(listEmployees) ? "zavřít" : "Zobrazit zaměstnance"}</button>
-            <button onClick={() => isThisActiveComponent(createOrder) ? closeComponent() : openComponent(createOrder)}>{isThisActiveComponent(createOrder) ? "zavřít" : "Vytvořit objednávku"}</button>
-            <button onClick={() => isThisActiveComponent(listOrder) ? closeComponent() : openComponent(listOrder)}>{isThisActiveComponent(listOrder) ? "zavřít" : "Zobrazit objednávky"}</button>
-            <button onClick={() => isThisActiveComponent(createProduct) ? closeComponent() : openComponent(createProduct)}>{isThisActiveComponent(createProduct) ? "zavřít" : "Vytvořit produkt"}</button>
-            <button onClick={() => isThisActiveComponent(listProduct) ? closeComponent() : openComponent(listProduct)}>{isThisActiveComponent(listProduct) ? "zavřít" : "Zobrazit produkty"}</button>
+        <div className="main-menu">
+            <button className="employee-create-btn" onClick={() => isThisActiveComponent(createEmployee) ? closeComponent() : openComponent(createEmployee)}>{isThisActiveComponent(createEmployee) ? "zavřít" : "Vytvořit zaměstnance"}</button>
+            <button className="employee-list-btn" onClick={() => isThisActiveComponent(listEmployees) ? closeComponent() : openComponent(listEmployees)}>{isThisActiveComponent(listEmployees) ? "zavřít" : "Zobrazit zaměstnance"}</button>
+            <button className="order-create-btn" onClick={() => isThisActiveComponent(createOrder) ? closeComponent() : openComponent(createOrder)}>{isThisActiveComponent(createOrder) ? "zavřít" : "Vytvořit objednávku"}</button>
+            <button className="employee-list-btn" onClick={() => isThisActiveComponent(listOrder) ? closeComponent() : openComponent(listOrder)}>{isThisActiveComponent(listOrder) ? "zavřít" : "Zobrazit objednávky"}</button>
+            <button className="product-create-btn" onClick={() => isThisActiveComponent(createProduct) ? closeComponent() : openComponent(createProduct)}>{isThisActiveComponent(createProduct) ? "zavřít" : "Vytvořit produkt"}</button>
+            <button className="product-list-btn" onClick={() => isThisActiveComponent(listProduct) ? closeComponent() : openComponent(listProduct)}>{isThisActiveComponent(listProduct) ? "zavřít" : "Zobrazit produkty"}</button>
             {isThisActiveComponent(createEmployee) ? <EmployeeCreateForm/> : null}
             {isThisActiveComponent(listEmployees) ? <EmployeeList/> : null}
             {isThisActiveComponent(createOrder) ? <OrderCreateForm/> : null}

@@ -1,0 +1,49 @@
+.daily-log {
+    list-style: none;
+    padding: 0;
+}
+
+.daily-log li {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.daily-log li:last-child {
+    margin-bottom: 0;
+}
+
+.daily-log li p {
+    margin: 0;
+}
+
+.total-work-time {
+    font-weight: bold;
+}
+
+.total-money-earned {
+    font-weight: bold;
+}
+
+.total-norm-time {
+    font-weight: bold;
+}
+.norm-ok {
+    color: green;
+}
+.norm-not-ok {
+    color: red;
+}
+.recorded {
+    font-weight: bold;
+}
+
+.product-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-list li {
+    margin: 0;
+}

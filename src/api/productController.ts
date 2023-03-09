@@ -57,7 +57,10 @@ ipcMain.handle('listProducts', async (): Promise<IProduct[]> => {
 ipcMain.on('updateProduct', async (event, product) => {
     await updateProduct(product);
 });
-
+ipcMain.handle('productExists', (event, articleNum) => {
+    validateProductGetInput(articleNum);
+    return fileExists(Path.join(PRODUCT_FILE_PATH, articleNum));
+});
 ipcMain.on('deleteProduct', async (event, articleNum) => {
     try {
         validateProductGetInput(articleNum);

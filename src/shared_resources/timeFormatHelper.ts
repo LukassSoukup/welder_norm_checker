@@ -6,6 +6,17 @@ export function toMillis(time: string) {
     return h + m;
 }
 
+export function formatTime(millis: number) {
+    const hours = Math.floor(millis / (1000 * 60 * 60));
+    const minutes = Math.floor((millis % (1000 * 60 * 60)) / (1000 * 60));
+    if(minutes === 0) return `${hours}h`
+    return `${hours}h ${minutes}min`;
+}
+
+export function formatNumber(num: string | number) {
+    return num.toLocaleString();
+}
+
 export function toTime(millis: number) {
     const hours = Math.floor(millis / (1000 * 60 * 60));
     const minutes = Math.floor((millis % (1000 * 60 * 60)) / (1000 * 60));

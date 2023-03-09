@@ -1,6 +1,13 @@
 import {ipcMain, IpcMainEvent} from "electron";
 import {validateOrderCreateInput, validateOrderGetInput} from "../file_managament/Utils/inputValidation";
-import {createFile, deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
+import {
+    createFile,
+    deleteFile,
+    fileExists,
+    loadFile,
+    loadFiles,
+    updateFile
+} from "../file_managament/Utils/file_manager";
 import Path from "path";
 import {
     errorLogger,
@@ -36,7 +43,10 @@ ipcMain.handle('getOrder', async (event, orderNumber) => {
         ValidationUpdateErr(TYPE, err, orderNumber);
     }
 });
-
+ipcMain.handle('orderExists', (event, orderNumber) => {
+    validateOrderGetInput(orderNumber);
+    return fileExists(Path.join(ORDER_FILE_PATH, orderNumber));
+});
 ipcMain.handle('listOrders', async () => {
     return await listOrders();
 });

@@ -1,0 +1,27 @@
+.log-for {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.log-date,
+.arrived-to-work,
+.left-work {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.log-date {
+    font-size: 14px;
+    font-style: italic;
+}
+
+.log-for {
+    margin-right: 5px;
+}
+
+.arrived-to-work,
+.left-work {
+    margin-bottom: 10px;
+}

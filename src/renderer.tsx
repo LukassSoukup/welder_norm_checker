@@ -33,14 +33,16 @@ declare global {
             delete: (id: string) => void;
             get: (id: string) => object;
             list: () => Promise<IlistResponse>;
+            exists: (id: string) => Promise<boolean>;
         };
         Product: {
             create: (obj: IProduct, byNewOrder?:boolean) => void;
-            update: (obj: object) => void;
+            update: (obj: IProduct) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
             list: () => Promise<IProduct[]>;
             reportError: (id: string) => void;
+            exists: (id: string) => Promise<boolean>;
         };
         Employee: {
             create: (obj: IEmployee) => void;
@@ -50,12 +52,12 @@ declare global {
             list: () => Promise<IlistResponse>;
         };
         DailyLog: {
-            add: (employeeId: string, moneyEarned: number, dailyLog: IDailyLog, date?: string) => void;
+            add: (employee: IEmployee, dailyLog: IDailyLog, date?: string) => void;
             update: (employeeId: string, recorded: string, dailyLog: IDailyLog, date?: string) => void;
             delete: (employeeId: string, date?: string) => void;
             get: (employeeId: string, recorded: string, date?: string) => object;
-            listByEmployee: (employeeId: string, date?: string) => object[];
-            listAll: (date: string) => object[];
+            listByEmployee: (employeeId: string, date?: string) => Promise<IEmployeesDailyLog>;
+            listAll: (date: string) => Promise<IEmployeesDailyLog>[];
         };
     }
 }

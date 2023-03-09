@@ -1,0 +1,66 @@
+button {
+    border: none;
+    background-color: #ddd;
+    color: #333;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+button:hover:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+input, .hourly-rate-input {
+    border: none;
+    border-bottom: 1px solid #ddd;
+    margin-left: 10px;
+    padding: 5px;
+    width: 200px;
+}
+
+input:focus, .hourly-rate-input:focus {
+    outline: none;
+    border-bottom: 2px solid #333;
+}
+
+.send-btn {
+    margin-top: 10px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.send-btn:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+.send-btn:active {
+    color: #fff;
+    background-color: #6e0000;
+}
+
+.send-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
