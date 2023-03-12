@@ -1,7 +1,9 @@
 import Path from "path";
 import {DAILY_LOG_FILE_PATH, inconsistentDataErr} from "../constants/file_paths";
 import {updateProduct} from "../../api/productController";
-import {toMillis} from "../../shared_resources/timeFormatHelper";
+import {toMillis} from "../../helpers/timeFormatHelper";
+import {updateEmployee} from "../../api/employeeController";
+import {calculateEmployeeWorkAllocation} from "../../helpers/calculationHelper";
 
 export function getMonthDir(_month?: string) {
     const time = _month ? new Date(_month) : new Date();
@@ -12,7 +14,7 @@ export function getMonthDir(_month?: string) {
 
 export function ensureOneLogPerDay(logs: IDailyLog[], recorded: string) {
     const is = logs?.some(log => new Date(log.recorded).toLocaleDateString() === new Date(recorded).toLocaleDateString());
-    if(is) {
+    if (is) {
         const e = new Error("Zaměstnanec si může vykázat za den pouze jednou!");
         e.name = "OncePerDayLog";
         throw e;
@@ -22,7 +24,7 @@ export function ensureOneLogPerDay(logs: IDailyLog[], recorded: string) {
 export function isIsoDate(str: string) {
     if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
     const d = new Date(str);
-    return d instanceof Date && !isNaN(Number(d)) && d.toISOString()===str;
+    return d instanceof Date && !isNaN(Number(d)) && d.toISOString() === str;
 }
 
 export function calculateNormAccomplishment(dailyLogs: IDailyLog[], products: IProduct[]) {
@@ -63,4 +65,40 @@ export function handleProductAmountChange(products: IProduct[], productAmountLis
             else updateProduct(product);
         }
     });
+}
+
+export function handleEmployeeWorkChange(employee: IEmployee, productAmountList: IProductAmountList, products: IProduct[]) {
+    for (const articleNum in productAmountList) {
+        if (employee.assignedWork[articleNum]) {
+            employee.assignedWork[articleNum] -= productAmountList[articleNum];
+            employee.assignedWorkTime -= calculateAssignWorkTime(products.find(p => p.articleNum === articleNum), productAmountList[articleNum]);
+            if(employee.assignedWork[articleNum] < 0) {
+                const err = new Error("Nelze vykázat víc práce, než kolik je přiděleno");
+                err.name = "assignedWork";
+                throw err;
+            }
+        } else {
+            const err = new Error("Nelze vykázat práci na výrobek, který není přiřazený");
+            err.name = "cantLogWorkForUnassignedWork";
+            throw err;
+        }
+    }
+    updateEmployee(employee);
+}
+
+export function ensureWorkAllocationNotExceedingProductAmount(employeeList: IEmployee[], productList: IProduct[]) {
+    const totalAllocatedWork = calculateEmployeeWorkAllocation(employeeList);
+    for(const articleNum in totalAllocatedWork) {
+        const product = productList.find(p => p.articleNum === articleNum);
+        if(product.amount < totalAllocatedWork[product.articleNum]) {
+            const err = new Error("Nedostečné množství produktů!");
+            err.name = "insufficientAmount";
+            throw err;
+        }
+    }
+}
+
+export function calculateAssignWorkTime(product: IProduct, amount: number) {
+    const millis = toMillis(product.timeToComplete);
+    return millis * amount;
 }

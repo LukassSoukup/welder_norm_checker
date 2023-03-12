@@ -1,6 +1,6 @@
 import {promises as fs} from 'fs';
 import {validateUniqueFile} from "./file_validator";
-import * as path from "path";
+import Path from "path";
 import {debugLogger, errorLogger, infoLogger} from "../constants/file_paths";
 import {dialog} from 'electron';
 
@@ -54,9 +54,19 @@ async function loadFiles(dirPath: string): Promise<any> {
         const fileNames = await fs.readdir(dirPath);
         const response: any = [];
         await Promise.all(fileNames.map(async (name: string) => {
-            let content = await fs.readFile(path.join(dirPath, name), {encoding: 'utf-8'});
-            content = JSON.parse(content.toString());
-            response.push(content);
+            let content = await fs.readFile(Path.join(dirPath, name), {encoding: 'utf-8'});
+            if (content.length > 0) {
+                content = JSON.parse(content.toString());
+                response.push(content);
+            }else {
+                // sometimes readFile returns an empty string on a file that clearly exists, so try to read it again
+                debugLogger(`File ${name} read failed. Reading again`)
+                content = await fs.readFile(Path.join(dirPath, name), {encoding: 'utf-8'});
+                if(content.length > 0) debugLogger("Success");
+                else debugLogger("Failed");
+                content = JSON.parse(content.toString());
+                response.push(content);
+            }
         }));
         if (response.length === 0) debugLogger(`No records found at ${dirPath}`);
         else infoLogger(`Loading multiple files from ${dirPath}`);

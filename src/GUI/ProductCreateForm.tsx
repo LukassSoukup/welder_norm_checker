@@ -7,7 +7,7 @@ type ProductCreateFormProps = {
 
 const defaultPrice = 0;
 const defaultAmount = 0;
-const defaultTimeToComplete = "00:30";
+const defaultTimeToComplete = "01:00";
 
 export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) => {
     const [articleNum, setArticleNum] = useState('');

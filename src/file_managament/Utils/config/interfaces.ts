@@ -17,6 +17,8 @@ interface IProduct {
 interface IEmployee {
     name: string;
     hourlyRate: number;
+    assignedWork: IProductAmountList;
+    assignedWorkTime: number;
     id?: string;
 }
 

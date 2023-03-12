@@ -18,6 +18,10 @@ export function validateProductCreateInput(obj: IProduct): void {
 export function validateProductGetInput(articleNum: string): void {
     if(!articleNum) throw isRequiredButMissingErr("Product.articleNum");
 }
+export function validateProductAddAmount(articleNum: string, amount: number): void {
+    if(!articleNum) throw isRequiredButMissingErr("Product.articleNum");
+    if(!amount) throw isRequiredButMissingErr("Product.amount");
+}
 
 export function validateEmployeeInput(obj: IEmployee): void {
     if(!obj.name) throw isRequiredButMissingErr("Employee.name");
@@ -25,6 +29,10 @@ export function validateEmployeeInput(obj: IEmployee): void {
 }
 export function validateEmployeeGetInput(id: string): void {
     if(!id) throw isRequiredButMissingErr("Employee.id");
+}
+export function validateEmployeeAssignWorkInput(id: string, productAmountList: IProductAmountList): void {
+    if(!id) throw isRequiredButMissingErr("Employee.id");
+    if(Object.keys(productAmountList).length === 0) throw isRequiredButMissingErr("Employee.productAmountList");
 }
 
 export function validateDailyLogAddInput(employee: IEmployee, obj: IDailyLog): void {

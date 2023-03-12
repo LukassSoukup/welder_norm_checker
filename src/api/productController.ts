@@ -1,6 +1,7 @@
 import {ipcMain} from "electron";
+import Path from "path";
 import {
-    validateProductGetInput, validateProductCreateInput,
+    validateProductGetInput, validateProductCreateInput, validateProductAddAmount,
 } from "../file_managament/Utils/inputValidation";
 import {
     createFile,
@@ -10,7 +11,6 @@ import {
     loadFiles,
     updateFile
 } from "../file_managament/Utils/file_manager";
-import Path from "path";
 import {
     errorLogger,
     PRODUCT_FILE_PATH, ValidationCreateErr,
@@ -51,12 +51,33 @@ ipcMain.handle('getProduct', async (event, articleNum) => {
 });
 
 ipcMain.handle('listProducts', async (): Promise<IProduct[]> => {
-    return await loadFiles(Path.join(PRODUCT_FILE_PATH));
+    const data = await loadFiles(Path.join(PRODUCT_FILE_PATH));
+    return data.sort((a: IProduct, b: IProduct) => (a.articleNum.toLowerCase() > b.articleNum.toLowerCase()) ? 1 : ((b.articleNum.toLowerCase() > a.articleNum.toLowerCase()) ? -1 : 0));
 });
 
 ipcMain.on('updateProduct', async (event, product) => {
     await updateProduct(product);
 });
+
+ipcMain.on('addAmount', async (event, id: string, amount: number) => {
+    try {
+        validateProductAddAmount(id, amount);
+        const fpath = Path.join(PRODUCT_FILE_PATH, id);
+        const fileExist = await fileExists(fpath);
+        if (fileExist) {
+            const product: IProduct = await loadFile(fpath);
+            product.amount += amount;
+            return await updateFile(fpath, product);
+        }
+        const err = new Error(`Product ${id} does not exist`);
+        errorLogger(err.message);
+        ValidationUpdateErr(TYPE, err, id);
+    } catch (err) {
+        errorLogger(err);
+        ValidationUpdateErr(TYPE, err, id);
+    }
+});
+
 ipcMain.handle('productExists', (event, articleNum) => {
     validateProductGetInput(articleNum);
     return fileExists(Path.join(PRODUCT_FILE_PATH, articleNum));

@@ -21,7 +21,7 @@ const App = () => {
 
     const openComponent = (componentName: string) => {
         setActiveComponent(componentName);
-        updateCurrencyRate("CZK", "EUR", DEFAULT_COMPANY_HOURLY_RATE);
+        //updateCurrencyRate("CZK", "EUR", DEFAULT_COMPANY_HOURLY_RATE);
     }
 
     const closeComponent = () => {

@@ -67,6 +67,7 @@ ipcMain.on('deleteOrder', async (event, orderNumber) => {
 
 export async function listOrders() {
     const orderList = await loadFiles(Path.join(ORDER_FILE_PATH));
+    orderList.sort((a: IOrder, b: IOrder) => (a.orderNumber.toLowerCase() > b.orderNumber.toLowerCase()) ? 1 : ((b.orderNumber.toLowerCase() > a.orderNumber.toLowerCase()) ? -1 : 0));
     return Promise.all(orderList.map(async (order: IOrder) => {
         const productAmounts = order.listOfProducts;
         order.listOfProducts = [];

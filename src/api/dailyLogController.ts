@@ -1,5 +1,6 @@
 import {dialog, ipcMain} from "electron";
 import Path from "path";
+import {createFilePath} from "../file_managament/Utils/file_validator";
 import {
     createFile,
     deleteFile,
@@ -12,7 +13,7 @@ import {
     calculateMoneyEarnedAndNormTime,
     calculateNormAccomplishment,
     ensureOneLogPerDay,
-    getMonthDir, handleProductAmountChange,
+    getMonthDir, handleEmployeeWorkChange, handleProductAmountChange,
 } from "../file_managament/Utils/calculationHelper";
 import {
     validateDailyLogAddInput,
@@ -20,13 +21,13 @@ import {
     validateDailyLogListInput, validateISODateFormatInput
 } from "../file_managament/Utils/inputValidation";
 import {
-    errorLogger, InvalidValueErr, NoRecordForGivenDate, PRODUCT_FILE_PATH,
+    AssignedWorkErr,
+    errorLogger, InvalidValueErr, LogForUnassignedWorkErr, NoRecordForGivenDate, PRODUCT_FILE_PATH,
     ValidationCreateErr,
     ValidationDeleteErr,
     ValidationGetErr,
     ValidationUpdateErr
 } from "../file_managament/constants/file_paths";
-import {createFilePath} from "../file_managament/Utils/file_validator";
 
 const TYPE = "výkazu"
 
@@ -52,6 +53,7 @@ ipcMain.on('addDailyLog', async (event, employee: IEmployee, dailyLog: IDailyLog
         dailyLog.normTime = dailyStats.totalNormTime;
         dailyLog.moneyEarned = dailyStats.moneyEarned;
         log.dailyLog.push(dailyLog);
+        log.dailyLog.sort((a: IDailyLog, b: IDailyLog) => (new Date(a.recorded) > new Date(b.recorded)) ? 1 : ((new Date(b.recorded) > new Date(a.recorded)) ? -1 : 0));
         const products: IProduct[] = await loadFiles(Path.join(PRODUCT_FILE_PATH));
 
         const {totalWorkTime, totalProductTime, normAccomplished} = calculateNormAccomplishment(log.dailyLog, products);
@@ -62,12 +64,15 @@ ipcMain.on('addDailyLog', async (event, employee: IEmployee, dailyLog: IDailyLog
         log.normAccomplished = normAccomplished;
         log.totalNormTime = totalNormTime;
 
-        handleProductAmountChange(products, dailyLog.productList)
+        handleEmployeeWorkChange(employee, dailyLog.productList, products);
+        handleProductAmountChange(products, dailyLog.productList);
         await updateFile(fpath, log);
     } catch (err) {
         errorLogger(err);
         if (err.name === "OncePerDayLog") dialog.showErrorBox(`Tento zaměstnanec má za dnešek již vykázáno.`, err.message);
         else if (err.name === 'invalidISODate') InvalidValueErr(err);
+        else if (err.name === 'assignedWork') AssignedWorkErr(err);
+        else if(err.name === "cantLogWorkForUnassignedWork") LogForUnassignedWorkErr(err);
         else ValidationCreateErr(TYPE, err, employee.id);
     }
 });

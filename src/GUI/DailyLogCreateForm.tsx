@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import TextInputWithWhisperer from "./TextInputWithWhisperer";
-import {toMillis} from "../shared_resources/timeFormatHelper";
+import {toMillis} from "../helpers/timeFormatHelper";
 import "./css/dailyLogCreateForm.css";
 import "./css/general.css";
 
 const defaultArrivedToWork = '07:00'
 const defaultLeftWork = '17:00'
 type amountDoneByProduct = { [articleNum: string]: number }
-export const DailyLogCreateForm = ({employee}: { employee: IEmployee }) => {
+export const DailyLogCreateForm = ({employee, rerender} : {employee: IEmployee, rerender: () => void }) => {
     const [arrivedToWork, SetArrivedToWork] = useState(defaultArrivedToWork);
     const [leftWork, setLeftWork] = useState(defaultLeftWork);
     const [amountDone, setAmountDone] = useState<amountDoneByProduct>({});
@@ -34,6 +34,7 @@ export const DailyLogCreateForm = ({employee}: { employee: IEmployee }) => {
             productList: productsToSet
         });
         eraseValues();
+        rerender();
     };
 
     const eraseValues = () => {
@@ -72,8 +73,8 @@ export const DailyLogCreateForm = ({employee}: { employee: IEmployee }) => {
             </label>
             <br/>
             <div id={"product-inputs"}>
-                <TextInputWithWhisperer amountDone={amountDone} setAmountDone={setAmountDone}
-                                        setSelectedProductList={setSelectedProductList}/>
+                <TextInputWithWhisperer setAmountDone={setAmountDone}
+                                        setSelectedProductList={setSelectedProductList} employeeAssignedWork={employee.assignedWork}/>
             </div>
             <br/>
             <label className="log-date">

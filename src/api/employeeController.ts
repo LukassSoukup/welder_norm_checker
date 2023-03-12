@@ -1,5 +1,9 @@
 import {ipcMain} from "electron";
-import {validateEmployeeGetInput, validateEmployeeInput} from "../file_managament/Utils/inputValidation";
+import {
+    validateEmployeeAssignWorkInput,
+    validateEmployeeGetInput,
+    validateEmployeeInput
+} from "../file_managament/Utils/inputValidation";
 import {createFile, deleteFile, loadFile, loadFiles, updateFile} from "../file_managament/Utils/file_manager";
 import Path from "path";
 import {
@@ -8,10 +12,14 @@ import {
     ValidationCreateErr,
     ValidationDeleteErr,
     ValidationGetErr,
-    ValidationUpdateErr
+    ValidationUpdateErr, PRODUCT_FILE_PATH
 } from "../file_managament/constants/file_paths";
 import {randomUUID} from "crypto";
-import {getMonthDir} from "../file_managament/Utils/calculationHelper";
+import {
+    calculateAssignWorkTime,
+    ensureWorkAllocationNotExceedingProductAmount,
+    getMonthDir
+} from "../file_managament/Utils/calculationHelper";
 
 const TYPE = "zaměstnance"
 
@@ -38,18 +46,32 @@ ipcMain.handle('getEmployee', async (event, id) => {
 });
 
 ipcMain.handle('listEmployees', async () => {
-    return await loadFiles(Path.join(EMPLOYEE_FILE_PATH));
+    const data = await loadFiles(Path.join(EMPLOYEE_FILE_PATH));
+    return data.sort((a: IEmployee, b: IEmployee) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 });
 
 ipcMain.on('updateEmployee', async (event, employee) => {
+    updateEmployee(employee);
+});
+
+ipcMain.on('assignWork', async (event, id: string, productAmountList: IProductAmountList) => {
     try {
-        validateEmployeeGetInput(employee.id);
-        const fpath = Path.join(EMPLOYEE_FILE_PATH, employee.id);
-        const oldEmployee = await loadFile(fpath);
-        await updateFile(fpath, {...oldEmployee, ...employee});
+        validateEmployeeAssignWorkInput(id, productAmountList);
+        let employeeList: IEmployee[] = await loadFiles(Path.join(EMPLOYEE_FILE_PATH));
+        const employee: IEmployee = employeeList.find((emp) => emp.id === id);
+        const products: IProduct[] = await loadFiles(Path.join(PRODUCT_FILE_PATH));
+        for(const articleNum in productAmountList) {
+            if(!employee.assignedWork[articleNum]) employee.assignedWork[articleNum] = productAmountList[articleNum];
+            else employee.assignedWork[articleNum] += productAmountList[articleNum];
+            employee.assignedWorkTime += calculateAssignWorkTime(products.find(p => p.articleNum === articleNum), employee.assignedWork[articleNum]);
+        }
+        employeeList = employeeList.filter((emp) => emp.id !== id);
+        employeeList.push(employee);
+        ensureWorkAllocationNotExceedingProductAmount(employeeList, products);
+        await updateFile(Path.join(EMPLOYEE_FILE_PATH, id), employee);
     } catch (err) {
         errorLogger(err);
-        ValidationUpdateErr(TYPE, err, employee.id);
+        ValidationUpdateErr(TYPE, err, id);
     }
 });
 
@@ -62,3 +84,15 @@ ipcMain.on('deleteEmployee', async (event, id) => {
         ValidationDeleteErr(TYPE, err, id);
     }
 });
+
+export async function updateEmployee(employee: IEmployee) {
+    try {
+        validateEmployeeGetInput(employee.id);
+        const fpath = Path.join(EMPLOYEE_FILE_PATH, employee.id);
+        const oldEmployee = await loadFile(fpath);
+        await updateFile(fpath, {...oldEmployee, ...employee});
+    } catch (err) {
+        errorLogger(err);
+        ValidationUpdateErr(TYPE, err, employee.id);
+    }
+}

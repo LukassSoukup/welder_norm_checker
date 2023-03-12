@@ -8,7 +8,7 @@ export const EmployeeCreateForm = () => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        window.Employee.create({name: employeeName, hourlyRate: hourlyRate});
+        window.Employee.create({name: employeeName, hourlyRate: hourlyRate, assignedWorkTime: 0, assignedWork: {}});
         eraseValues();
     };
 

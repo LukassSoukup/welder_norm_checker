@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('Order', {
 contextBridge.exposeInMainWorld('Product', {
     create: (product: IProduct, byNewOrder?: boolean) => ipcRenderer.send('createProduct', product, byNewOrder),
     update: (product: object) => ipcRenderer.send('updateProduct', product),
+    addAmount: (id: string, amount: number) => ipcRenderer.send('addAmount', id, amount),
     delete: (id: string) => ipcRenderer.send('deleteProduct', id),
     get: (id: string) => ipcRenderer.invoke('getProduct', id),
     list: () => ipcRenderer.invoke("listProducts"),
@@ -28,6 +29,7 @@ contextBridge.exposeInMainWorld('Product', {
 contextBridge.exposeInMainWorld('Employee', {
     create: (employee: object) => ipcRenderer.send('createEmployee', employee),
     update: (employee: object) => ipcRenderer.send('updateEmployee', employee),
+    assignWork: (id: string, productAmountList: IProductAmountList) => ipcRenderer.send('assignWork', id, productAmountList),
     delete: (id: string) => ipcRenderer.send('deleteEmployee', id),
     get: (id: string) => ipcRenderer.invoke('getEmployee', id),
     list: () => ipcRenderer.invoke("listEmployees")

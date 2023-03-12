@@ -38,6 +38,7 @@ declare global {
         Product: {
             create: (obj: IProduct, byNewOrder?:boolean) => void;
             update: (obj: IProduct) => void;
+            addAmount: (id: string, amount: number) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
             list: () => Promise<IProduct[]>;
@@ -47,9 +48,10 @@ declare global {
         Employee: {
             create: (obj: IEmployee) => void;
             update: (obj: object) => void;
+            assignWork: (id: string, productAmountList: IProductAmountList) => void;
             delete: (id: string) => void;
             get: (id: string) => object;
-            list: () => Promise<IlistResponse>;
+            list: () => Promise<IEmployee[]>;
         };
         DailyLog: {
             add: (employee: IEmployee, dailyLog: IDailyLog, date?: string) => void;

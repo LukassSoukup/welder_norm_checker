@@ -1,14 +1,13 @@
 import React, {KeyboardEvent, useEffect, useRef, useState} from 'react';
 import './css/textInputWithWhisperer.css';
-
-// Define the types for the component's props and state
-type amountDoneByProduct = { [articleNum: string]: number }
+import {calculateRemainingProductAmountsForWorkAllocation} from "../helpers/calculationHelper";
 
 type TextInputWithWhispererProps = {
-    setAmountDone: React.Dispatch<React.SetStateAction<amountDoneByProduct>>;
-    amountDone: amountDoneByProduct;
+    setAmountDone: React.Dispatch<React.SetStateAction<IProductAmountList>>;
     setSelectedProductList: React.Dispatch<React.SetStateAction<IProduct[]>>;
     forOrder?: boolean;
+    allocatedWork?: IProductAmountList;
+    employeeAssignedWork?: IProductAmountList;
 };
 type TextInputWithWhispererState = {
     inputValue: IProduct;
@@ -17,12 +16,12 @@ type TextInputWithWhispererState = {
 };
 
 function TextInputWithWhisperer({
-                                    amountDone,
                                     setAmountDone,
                                     setSelectedProductList,
-                                    forOrder
+                                    forOrder,
+                                    allocatedWork, // for workAssignment
+                                    employeeAssignedWork // for dailyLog
                                 }: TextInputWithWhispererProps) {
-    // Define the component's state
     const initialState = {
         inputValue: {articleNum: '', price: 0, timeToComplete: ''},
         showWhisperer: false,
@@ -32,15 +31,29 @@ function TextInputWithWhisperer({
     const [productSelected, setProductSelected] = useState(false);
     const [state, setState] = useState<TextInputWithWhispererState>(initialState);
     const [productListAll, setProductListAll] = useState<IProduct[]>([]);
-    const [localAmountDone, setLocalAmountDone] = useState<amountDoneByProduct>({});
-
-    // Filter the products array based on the input value
-    const filteredProducts = productListAll.filter((product) =>
-        product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && ((product.amount > 0 && !amountDone[product.articleNum]) || forOrder)
-    );
+    const [localAmountDone, setLocalAmountDone] = useState<IProductAmountList>({});
+    let remainingProductAmount: IProductAmountList = {};
+    let filteredProducts: IProduct[];
+    // pro workAssignment - nemůžeš přiřadit víc práce než je celkově allokováno, pokud není nic alokováno, nemůžeš přidělit víc než je počtu produktů
+    // pro dailyLog - zobraz jen ty produkty, které má zaměstnanec allokováno
+    if (productListAll.length > 0) {
+        if (forOrder) {
+            filteredProducts = productListAll.filter((product) =>
+                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && forOrder
+            );
+        } else if (allocatedWork) { // for workAssignment
+            remainingProductAmount = calculateRemainingProductAmountsForWorkAllocation(productListAll, allocatedWork);
+            filteredProducts = productListAll.filter((product) => product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && remainingProductAmount[product.articleNum] > 0);
+        }
+        // pro dailyLog
+        else if (employeeAssignedWork) {
+            filteredProducts = productListAll.filter((product) =>
+                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && employeeAssignedWork[product.articleNum] > 0
+            );
+        }
+    }
     useEffect(() => {
         window.Product.list().then((data) => {
-            console.log(data);
             setProductListAll(data);
         });
     }, [])
@@ -108,6 +121,29 @@ function TextInputWithWhisperer({
         }))
     }
 
+    function setInputMaxLimit() {
+        if (forOrder) {
+            return Infinity;
+        } else if (employeeAssignedWork) {
+            // pro dailyLog - neměl by být schopen vykázat víc množství než má allokováno
+            if (localAmountDone[state.inputValue.articleNum] > employeeAssignedWork[state.inputValue.articleNum]) {
+                setLocalAmountDone((prev) => ({
+                    ...prev,
+                    [state.inputValue.articleNum]: employeeAssignedWork[state.inputValue.articleNum]
+                }))
+            }
+            return employeeAssignedWork[state.inputValue.articleNum]
+        }
+        // pro workAllocation neměl by mít možnost přidělit víc než než existuje
+        if (localAmountDone[state.inputValue.articleNum] > remainingProductAmount[state.inputValue.articleNum]) {
+            setLocalAmountDone((prev) => ({
+                ...prev,
+                [state.inputValue.articleNum]: remainingProductAmount[state.inputValue.articleNum]
+            }))
+        }
+        return remainingProductAmount[state.inputValue.articleNum];
+    }
+
     return (
         <>
             <div className="textInputWithWhisperer" ref={componentRef}>
@@ -136,7 +172,7 @@ function TextInputWithWhisperer({
             {productSelected &&
                 <>
                     <input placeholder="Počet kusů" type="number"
-                           max={forOrder ? Infinity : state.inputValue.amount} min={0}
+                           max={setInputMaxLimit()} min={0}
                            value={localAmountDone[state.inputValue.articleNum] ? localAmountDone[state.inputValue.articleNum] : ''}
                            onChange={event => handleAmountChange(event)}/>
                     <button onClick={onConfirmBtnClick}>Potvrdit</button>

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import "./css/dailyLogList.css";
 import "./css/general.css";
-import {formatNumber, formatTime} from "../shared_resources/timeFormatHelper";
+import {formatNumber, formatTime} from "../helpers/timeFormatHelper";
 
 export const DailyLogList = ({employee}: { employee: IEmployee }) => {
     const [employeeDailyLog, setEmployeeDailyLog] = useState<IEmployeesDailyLog>({
@@ -19,6 +19,8 @@ export const DailyLogList = ({employee}: { employee: IEmployee }) => {
             setEmployeeDailyLog(data);
         });
     }, []);
+
+    if(employeeDailyLog.dailyLog.length === 0) return null;
 
     return (
         <div>
