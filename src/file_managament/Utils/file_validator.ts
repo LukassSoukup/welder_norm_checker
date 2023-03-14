@@ -17,4 +17,10 @@ function validateUniqueFile(filePath: string): void {
     }
 }
 
-export {createFilePath, validateUniqueFile}
+function createLicenceFile(filePath: string): void {
+    if (!fs.existsSync(filePath)) {
+        // File does not exist, create it
+        fs.writeFileSync(filePath, "");
+    }
+}
+export {createFilePath, validateUniqueFile, createLicenceFile}

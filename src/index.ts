@@ -3,9 +3,10 @@ import "./api/orderController";
 import "./api/productController";
 import "./api/employeeController";
 import "./api/dailyLogController";
-import {createFilePath} from "./file_managament/Utils/file_validator";
+import "./api/licenseKeyChecker";
+import {createFilePath, createLicenceFile} from "./file_managament/Utils/file_validator";
 import {
-  EMPLOYEE_FILE_PATH,
+  EMPLOYEE_FILE_PATH, LICENCE_KEY_PATH,
   ORDER_FILE_PATH,
   PRODUCT_FILE_PATH
 } from "./file_managament/constants/file_paths";
@@ -44,6 +45,7 @@ const createWindow = (): void => {
   createFilePath(PRODUCT_FILE_PATH);
   createFilePath(EMPLOYEE_FILE_PATH);
   createFilePath(getMonthDir());
+  createLicenceFile(LICENCE_KEY_PATH)
 };
 
 // This method will be called when Electron has finished

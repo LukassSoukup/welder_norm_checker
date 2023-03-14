@@ -1,5 +1,6 @@
 import {dialog} from "electron";
 
+export const LICENCE_KEY_PATH = __dirname + "/../../storage/licence.key";
 export const EMPLOYEE_FILE_PATH = __dirname + "/../../storage/zamestnanci";
 export const ORDER_FILE_PATH = __dirname + "/../../storage/zakazky";
 export const PRODUCT_FILE_PATH = __dirname + "/../../storage/produkty";

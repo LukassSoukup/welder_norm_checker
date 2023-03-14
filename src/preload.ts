@@ -43,3 +43,8 @@ contextBridge.exposeInMainWorld('DailyLog', {
     listByEmployee: (employeeId: string, date?: string) => ipcRenderer.invoke("listLogsByMonthAndEmployee", employeeId, date),
     listAll: (date: string) => ipcRenderer.invoke("listAllLogsByMonth", date)
 });
+
+contextBridge.exposeInMainWorld('LicenceKey', {
+    check: (key: string) => ipcRenderer.invoke("checkLicenceKey", key),
+    load: () => ipcRenderer.invoke("loadLicenceKey"),
+});

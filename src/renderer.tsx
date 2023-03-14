@@ -61,6 +61,10 @@ declare global {
             listByEmployee: (employeeId: string, date?: string) => Promise<IEmployeesDailyLog>;
             listAll: (date: string) => Promise<IEmployeesDailyLog>[];
         };
+        LicenceKey: {
+            check: (key: string) => Promise<boolean>;
+            load: () => Promise<string>;
+        }
     }
 }
 
