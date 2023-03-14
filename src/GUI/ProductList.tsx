@@ -108,6 +108,7 @@ export const ProductUpdate = ({product, closeEdit}: { product: IProduct, closeEd
             <input className="price-input" min="0" placeholder="Kč" type="number" value={stateProduct.price ? stateProduct.price : ''} onChange={event => updateProductState("price", Number(event.target.value))}/>
             </label>
             <br/>
+            {/* TODO implement in productController/update
             <label className="amount">
                 Počet:
                 <input className="amount-input" min="0" type="number" value={stateProduct.amount ? stateProduct.amount : ''} onChange={event => updateProductState("amount", Number(event.target.value))}/>
@@ -118,6 +119,7 @@ export const ProductUpdate = ({product, closeEdit}: { product: IProduct, closeEd
             <input className="time-to-complete-input" type="time" value={stateProduct.timeToComplete} onChange={event => updateProductState("timeToComplete", event.target.value)}/>
             </label>
             <br />
+            */}
             <label className="description">
                 Poznámka:
             <input className="description-input" type="text" value={stateProduct.detail} onChange={event => updateProductState("detail", event.target.value)} />

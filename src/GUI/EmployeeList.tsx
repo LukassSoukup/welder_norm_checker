@@ -21,17 +21,17 @@ export const EmployeeList = () => {
 
     const getEmployeeList = () => {
         window.Employee.list().then((data) => {
-            setEmployeeList(() => data);
+            setEmployeeList(data);
         });
     }
-
+    const forceUpdateFn = () => {
+        setTimeout(() => getEmployeeList(), 600);
+    }
     const openCreateMenu = (id: string, type: string) => {
         setActiveEmployee([id, type]);
-
     }
     const closeCreateMenu = () => {
         setActiveEmployee([]);
-
     }
     const isActiveBtn = (id: string, type: string) => {
         return activeEmployee[0] === id && activeEmployee[1] === type;
@@ -41,6 +41,16 @@ export const EmployeeList = () => {
         if (isActiveBtn(id, type)) closeCreateMenu()
         else openCreateMenu(id, type)
     }
+    const hasWorkAssigned = (employee: IEmployee): boolean => {
+        if(Object.keys(employee.assignedWork).length === 0) return false;
+        let workAmount = 0;
+        for(const articleNum in employee.assignedWork) {
+            workAmount += employee.assignedWork[articleNum];
+        }
+        return workAmount > 0;
+    }
+
+
     return (
         <div>
             <ul className="employee-list">
@@ -55,10 +65,10 @@ export const EmployeeList = () => {
                             return (
                                 <div>
                                     <p><b>{articleNum}:</b> {employee.assignedWork[articleNum]} ks</p>
-                                    <p><b>Očekávaná doba práce:</b> {formatTime(employee.assignedWorkTime)}</p>
                                 </div>
                             )
                         })}
+                        {hasWorkAssigned(employee) ? <p><b>Očekávaná doba práce:</b> {formatTime(employee.assignedWorkTime)}</p> : null}
                         <button className="assign-work-btn"
                                 onClick={() => setActionBtn(employee.id, assignWork)}>{isActiveBtn(employee.id, assignWork) ? "Zavřít" : "Přiřadit práci"}</button>
                         <button className="create-log-btn"
@@ -67,9 +77,9 @@ export const EmployeeList = () => {
                                 onClick={() => setActionBtn(employee.id, dailyLogList)}>{isActiveBtn(employee.id, dailyLogList) ? "Zavřít" : "Zobrazit práci"}</button>
                         {isActiveBtn(employee.id, assignWork) ?
                             <AssignWorkToEmployee allocatedWork={calculateEmployeeWorkAllocation(employeeList)}
-                                                  employee={employee} rerender={getEmployeeList}/> : null}
+                                                  employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
                         {isActiveBtn(employee.id, dailyLogCreate) ?
-                            <DailyLogCreateForm employee={employee} rerender={getEmployeeList}/> : null}
+                            <DailyLogCreateForm employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
                         {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee}/> : null}
                     </li>
                 ))}
@@ -81,20 +91,27 @@ export const EmployeeList = () => {
 export const AssignWorkToEmployee = ({
                                          allocatedWork,
                                          employee,
-                                         rerender
-                                     }: { allocatedWork: IProductAmountList, employee: IEmployee, rerender: () => void }) => {
+                                         forceUpdateFn
+                                     }: { allocatedWork: IProductAmountList, employee: IEmployee, forceUpdateFn: () => void }) => {
     const [amountToDo, setAmountToDo] = useState<IProductAmountList>({});
     const [selectedProductList, setSelectedProductList] = useState<IProduct[]>([]);
 
     const confirmBtn = () => {
         window.Employee.assignWork(employee.id, amountToDo);
-        rerender();
+        forceUpdateFn()
+        setSelectedProductList([]);
+        setAmountToDo({});
     }
     return (
-        <div>
+        <div className="assign-work-section">
             <TextInputWithWhisperer setAmountDone={setAmountToDo} setSelectedProductList={setSelectedProductList}
                                     allocatedWork={allocatedWork}/>
             <br/>
+            <ul className="selected-product-list">
+            {selectedProductList.length > 0 && selectedProductList.map(product => (
+                <li className="selected-product" key={product.articleNum}>{product.articleNum} {amountToDo[product.articleNum]} ks</li>
+            ))}
+            </ul>
             <button disabled={selectedProductList.length === 0} onClick={() => confirmBtn()}
                     className="send-btn">Přiřadit
             </button>

@@ -56,6 +56,8 @@ ipcMain.handle('listProducts', async (): Promise<IProduct[]> => {
 });
 
 ipcMain.on('updateProduct', async (event, product) => {
+    // TODO on timeToComplete update recalculate everywhere totalWorkTime, workTime
+    // TODO if newAmount < product.amout check all work allocation and make sure the update is possible without messing up the data
     await updateProduct(product);
 });
 

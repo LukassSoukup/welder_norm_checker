@@ -32,6 +32,7 @@ function TextInputWithWhisperer({
     const [state, setState] = useState<TextInputWithWhispererState>(initialState);
     const [productListAll, setProductListAll] = useState<IProduct[]>([]);
     const [localAmountDone, setLocalAmountDone] = useState<IProductAmountList>({});
+
     let remainingProductAmount: IProductAmountList = {};
     let filteredProducts: IProduct[];
     // pro workAssignment - nemůžeš přiřadit víc práce než je celkově allokováno, pokud není nic alokováno, nemůžeš přidělit víc než je počtu produktů
@@ -112,13 +113,17 @@ function TextInputWithWhisperer({
     }
 
     function onConfirmBtnClick() {
-        setState(initialState);
-        setProductSelected(false);
-        setSelectedProductList(prev => [...prev, state.inputValue]);
+        setSelectedProductList(prev => {
+            if(prev.find(p => p.articleNum === state.inputValue.articleNum)) return [...prev];
+            return [...prev, state.inputValue]
+        });
         setAmountDone((prev) => ({
             ...prev,
             [state.inputValue.articleNum]: localAmountDone[state.inputValue.articleNum]
         }))
+        setLocalAmountDone({});
+        setState(initialState);
+        setProductSelected(false);
     }
 
     function setInputMaxLimit() {

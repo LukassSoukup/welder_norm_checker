@@ -7,7 +7,10 @@ import "./css/general.css";
 const defaultArrivedToWork = '07:00'
 const defaultLeftWork = '17:00'
 type amountDoneByProduct = { [articleNum: string]: number }
-export const DailyLogCreateForm = ({employee, rerender} : {employee: IEmployee, rerender: () => void }) => {
+export const DailyLogCreateForm = ({
+                                       employee,
+                                       forceUpdateFn
+                                   }: { employee: IEmployee, forceUpdateFn: () => void }) => {
     const [arrivedToWork, SetArrivedToWork] = useState(defaultArrivedToWork);
     const [leftWork, setLeftWork] = useState(defaultLeftWork);
     const [amountDone, setAmountDone] = useState<amountDoneByProduct>({});
@@ -34,7 +37,7 @@ export const DailyLogCreateForm = ({employee, rerender} : {employee: IEmployee, 
             productList: productsToSet
         });
         eraseValues();
-        rerender();
+        forceUpdateFn();
     };
 
     const eraseValues = () => {
@@ -46,14 +49,14 @@ export const DailyLogCreateForm = ({employee, rerender} : {employee: IEmployee, 
     }
 
     const validateArrivedToWork = (value: string) => {
-        if(toMillis(leftWork) > toMillis(value)){
+        if (toMillis(leftWork) > toMillis(value)) {
             SetArrivedToWork(value);
-        }else alert("Příchod musí být dřív než odchod!");
+        } else alert("Příchod musí být dřív než odchod!");
     }
     const validateLeftWork = (value: string) => {
-        if(toMillis(arrivedToWork) > toMillis(value)){
+        if (toMillis(arrivedToWork) > toMillis(value)) {
             setLeftWork(value);
-        }else alert("Příchod musí být dřív než odchod!");
+        } else alert("Příchod musí být dřív než odchod!");
     }
     return (
         <form className="daily-log-create-form" onSubmit={handleSubmit}>
@@ -62,24 +65,34 @@ export const DailyLogCreateForm = ({employee, rerender} : {employee: IEmployee, 
             <br/>
             <label className="arrived-to-work">
                 Příchod:
-                <input className="arrived-to-work-input" type="time" value={arrivedToWork} onChange={event => validateArrivedToWork(event.target.value)}
+                <input className="arrived-to-work-input" type="time" value={arrivedToWork}
+                       onChange={event => validateArrivedToWork(event.target.value)}
                        required={true}/>
             </label>
             <br/>
             <label className="left-work">
                 Odchod:
-                <input className="left-work-input" type="time" value={leftWork} onChange={event => validateLeftWork(event.target.value)}
+                <input className="left-work-input" type="time" value={leftWork}
+                       onChange={event => validateLeftWork(event.target.value)}
                        required={true}/>
             </label>
             <br/>
             <div id={"product-inputs"}>
                 <TextInputWithWhisperer setAmountDone={setAmountDone}
-                                        setSelectedProductList={setSelectedProductList} employeeAssignedWork={employee.assignedWork}/>
+                                        setSelectedProductList={setSelectedProductList}
+                                        employeeAssignedWork={employee.assignedWork}/>
+                <ul className="selected-product-list">
+                    {selectedProductList.length > 0 && selectedProductList.map(product => (
+                        <li className="selected-product"
+                            key={product.articleNum}>{product.articleNum} {amountDone[product.articleNum]} ks</li>
+                    ))}
+                </ul>
             </div>
             <br/>
             <label className="log-date">
                 Zpětně vykázat:
-                <input className="log-date-input" type="date" value={date} onChange={event => setDate(event.target.value)}/>
+                <input className="log-date-input" type="date" value={date}
+                       onChange={event => setDate(event.target.value)}/>
             </label>
             <br/>
             <button className="send-btn" type="submit">Vykázat</button>

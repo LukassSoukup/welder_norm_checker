@@ -50,7 +50,7 @@ declare global {
             update: (obj: object) => void;
             assignWork: (id: string, productAmountList: IProductAmountList) => void;
             delete: (id: string) => void;
-            get: (id: string) => object;
+            get: (id: string) => Promise<IEmployee>;
             list: () => Promise<IEmployee[]>;
         };
         DailyLog: {
