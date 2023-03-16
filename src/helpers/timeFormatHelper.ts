@@ -10,6 +10,7 @@ export function formatTime(millis: number) {
     const hours = Math.floor(millis / (1000 * 60 * 60));
     const minutes = Math.floor((millis % (1000 * 60 * 60)) / (1000 * 60));
     if(minutes === 0) return `${hours}h`
+    if(hours === 0) return `${minutes}min`
     return `${hours}h ${minutes}min`;
 }
 

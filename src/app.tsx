@@ -10,12 +10,13 @@ import "./GUI/css/app.css";
 const App = () => {
     const [activeComponent, setActiveComponent] = useState(null);
     const [key, setKey] = useState('');
-    const [isValidKey, setIsValidKey] = useState(new Date().toISOString() < "2023-03-31T14:48:00.000Z");
+    const [isValidKey, setIsValidKey] = useState(new Date() < new Date("2023-04-15T14:48:00.000Z"));
 
     useEffect(() => {
         window.LicenceKey.load().then(r => {
             setKey(r)
-            setIsValidKey(r === LICENCE_KEY);
+            if(!isValidKey) setIsValidKey(r === LICENCE_KEY);
+            openComponent(listEmployees);
         });
     }, [])
 
