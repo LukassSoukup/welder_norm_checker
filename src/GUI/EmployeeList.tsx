@@ -8,9 +8,10 @@ import "./css/employeeList.css";
 import "./css/general.css";
 
 export const EmployeeList = () => {
+    const initialDate = new Date().toISOString();
     const [employeeList, setEmployeeList] = useState<IEmployee[]>([]);
     const [activeEmployee, setActiveEmployee] = useState([]);
-    const [date, setDate] = useState(new Date().toISOString()); // if set, has to be ISO format
+    const [date, setDate] = useState(initialDate); // if set, has to be ISO format
 
     const dailyLogCreate = "dailyLogCreate";
     const dailyLogList = "dailyLogList";
@@ -51,7 +52,7 @@ export const EmployeeList = () => {
         }
         return workAmount > 0;
     }
-
+    console.log(date);
     return (
         <div>
             <ul className="employee-list">
@@ -84,7 +85,7 @@ export const EmployeeList = () => {
                                                       employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
                             {isActiveBtn(employee.id, dailyLogCreate) ?
                                 <DailyLogCreateForm employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
-                            {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee} date={new Date(date).toISOString()}/> : null}
+                            {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee} date={date ? new Date(date).toISOString() : initialDate}/> : null}
                         </div>
                     </li>
                 ))}
