@@ -7,7 +7,7 @@ export const mainConfig: Configuration = {
    * This is the main entry point for your application, it's the first file
    * that runs in the main process.
    */
-  mode: 'production',
+  mode: 'development',
   target: 'electron-main',
   entry: './src/index.ts',
   output: {
