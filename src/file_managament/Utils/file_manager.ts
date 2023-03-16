@@ -27,13 +27,14 @@ async function updateFile(filePath: string, newContent: object): Promise<void> {
     }
 }
 
-async function loadFile(filePath: string) {
+async function loadFile(filePath: string, forDailyLog?: string) {
     filePath += ".json";
     try {
         const data = await fs.readFile(filePath, "utf8");
         infoLogger(`Loading file from ${filePath}`);
         return JSON.parse(data.toString());
     } catch (err) {
+        if(forDailyLog) throw err;
         errorLogger(err);
         dialog.showErrorBox(`Chyba načítání souboru ${getFileName(filePath)}`, err.message);
     }

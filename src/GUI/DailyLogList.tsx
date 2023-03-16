@@ -3,22 +3,31 @@ import "./css/dailyLogList.css";
 import "./css/general.css";
 import {formatNumber, formatTime} from "../helpers/timeFormatHelper";
 
-export const DailyLogList = ({employee}: { employee: IEmployee }) => {
-    const [employeeDailyLog, setEmployeeDailyLog] = useState<IEmployeesDailyLog>({
-        employeeId: '',
-        moneyEarned: 0,
-        normAccomplished: false,
-        totalNormTime: 0,
-        totalWorkTime: 0,
-        totalProductTime: 0,
-        dailyLog: []
-    });
+const initialEmployeeDailyLog: IEmployeesDailyLog = {
+    employeeId: '',
+    moneyEarned: 0,
+    normAccomplished: false,
+    totalNormTime: 0,
+    totalWorkTime: 0,
+    totalProductTime: 0,
+    dailyLog: []
+}
+export const DailyLogList = ({employee, date}: { employee: IEmployee, date: string }) => {
+    const [employeeDailyLog, setEmployeeDailyLog] = useState<IEmployeesDailyLog>(initialEmployeeDailyLog);
 
     useEffect(() => {
-        window.DailyLog.listByEmployee(employee.id).then((data) => {
-            setEmployeeDailyLog(data);
-        });
-    }, []);
+        if(date.length > 0) {
+            window.DailyLog.listByEmployee(employee.id, date).then((data) => {
+                if(!data) setEmployeeDailyLog(initialEmployeeDailyLog);
+                else setEmployeeDailyLog(data);
+            });
+        }else {
+            window.DailyLog.listByEmployee(employee.id).then((data) => {
+                if(!data) setEmployeeDailyLog(initialEmployeeDailyLog);
+                else setEmployeeDailyLog(data);
+            });
+        }
+    }, [date]);
 
     if(employeeDailyLog.dailyLog.length === 0) return null;
 

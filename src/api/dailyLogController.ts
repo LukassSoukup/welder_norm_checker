@@ -95,7 +95,7 @@ ipcMain.handle('listLogsByMonthAndEmployee', async (event, employeeId: string, d
     try {
         validateDailyLogListInput(employeeId);
         if (date) validateISODateFormatInput(date);
-        return await loadFile(Path.join(getMonthDir(date), employeeId));
+        return await loadFile(Path.join(getMonthDir(date), employeeId), "forDailyLog");
     } catch (err) {
         errorLogger(err);
         if(date && err.code === "ENOENT") return NoRecordForGivenDate(date, err);

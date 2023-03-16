@@ -50,3 +50,14 @@
     padding: 10px;
     margin-left: 10px;
 }
+
+.DailyLog-date-input {
+    width: 90%;
+}
+
+.list-log-btn-active {
+    height: 42.5px !important;
+}
+.list-log-btn-active h3 {
+    margin-top: 0;
+}

@@ -13,7 +13,7 @@ export const ValidationUpdateErr = (type: string, errMsg: Error, file: string) =
 export const ValidationGetErr = (type: string, errMsg: Error, file: string) => dialog.showErrorBox(`Chyba validace načtení ${type} ${file}`, errMsg.message);
 export const ValidationDeleteErr = (type: string, errMsg: Error, file: string) => dialog.showErrorBox(`Chyba validace odmazání ${type} ${file}`, errMsg.message);
 export const InvalidValueErr = (errMsg: Error) => dialog.showErrorBox(`Invalid value!`, errMsg.message);
-export const NoRecordForGivenDate = (date: string, errMsg: Error) => dialog.showErrorBox(`žádné záznamy pro vybrané datum ${date}`, errMsg.message);
+export const NoRecordForGivenDate = (date: string, errMsg: Error) => dialog.showErrorBox(`žádné záznamy pro vybrané datum ${new Date(date).getMonth()}. ${new Date(date).getFullYear()}`, errMsg.message);
 export const AssignedWorkErr = (errMsg: Error) => dialog.showErrorBox(`Přidělené práce je méně než vykazuješ`, errMsg.message);
 export const LogForUnassignedWorkErr = (errMsg: Error) => dialog.showErrorBox(`Nelze vykázat nepřidělenou práci`, errMsg.message);
 

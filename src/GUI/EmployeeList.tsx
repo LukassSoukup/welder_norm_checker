@@ -10,6 +10,7 @@ import "./css/general.css";
 export const EmployeeList = () => {
     const [employeeList, setEmployeeList] = useState<IEmployee[]>([]);
     const [activeEmployee, setActiveEmployee] = useState([]);
+    const [date, setDate] = useState(new Date().toISOString()); // if set, has to be ISO format
 
     const dailyLogCreate = "dailyLogCreate";
     const dailyLogList = "dailyLogList";
@@ -51,7 +52,6 @@ export const EmployeeList = () => {
         return workAmount > 0;
     }
 
-
     return (
         <div>
             <ul className="employee-list">
@@ -72,7 +72,10 @@ export const EmployeeList = () => {
                                     onClick={() => setActionBtn(employee.id, assignWork)}><h3>{isActiveBtn(employee.id, assignWork) ? "Zavřít" : "Přiřadit práci"}</h3></button>
                             <button className="create-log-btn" style={{backgroundColor: `${isActiveBtn(employee.id, dailyLogCreate)? btnColor : ''}`}}
                                     onClick={() => setActionBtn(employee.id, dailyLogCreate)}><h3>{isActiveBtn(employee.id, dailyLogCreate) ? "Zavřít" : "Vykázat práci"}</h3></button>
-                            <button className="list-log-btn" style={{backgroundColor: `${isActiveBtn(employee.id, dailyLogList)? btnColor : ''}`}}
+                            {isActiveBtn(employee.id, dailyLogList) && (<input placeholder="Vyber datum" className="DailyLog-date-input" type="month" value={date}
+                                   onChange={event => setDate(event.target.value)}/>
+                            )}
+                            <button className={isActiveBtn(employee.id, dailyLogList)? "list-log-btn-active" : "list-log-btn"} style={{backgroundColor: `${isActiveBtn(employee.id, dailyLogList)? btnColor : ''}`}}
                                     onClick={() => setActionBtn(employee.id, dailyLogList)}><h3>{isActiveBtn(employee.id, dailyLogList) ? "Zavřít" : "Zobrazit práci"}</h3></button>
                         </div>
                         <div className="employee-control-panel">
@@ -81,7 +84,7 @@ export const EmployeeList = () => {
                                                       employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
                             {isActiveBtn(employee.id, dailyLogCreate) ?
                                 <DailyLogCreateForm employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
-                            {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee}/> : null}
+                            {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee} date={new Date(date).toISOString()}/> : null}
                         </div>
                     </li>
                 ))}
