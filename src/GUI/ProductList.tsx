@@ -1,4 +1,4 @@
-import React, {Dispatch, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import "./css/general.css";
 import "./css/productList.css";
 import Icon from '@mdi/react';
@@ -17,18 +17,18 @@ export const ProductList = () => {
     const [showAddAmount, setShowAddAmount] = useState('');
 
     useEffect(() => {
-        if (updateProduct.articleNum === "updated!" || showAddAmount === 'updated!') {
-            initialProduct.articleNum = '';
-            loadProducts();
-        } else if (productList.length === 0) {
-            loadProducts();
-        }
-    }, [updateProduct, showAddAmount]);
+        loadProducts();
+    }, []);
 
     const loadProducts = () => {
         window.Product.list().then((data) => {
             setProductList(data);
         });
+    }
+    const forceUpdateFn = (isUpdate?: boolean) => {
+        if(isUpdate) setTimeout(() => loadProducts(), 200);
+        setShowAddAmount('');
+        setUpdateProduct(initialProduct);
     }
     const openMenu = (product: IProduct) => {
         if (updateProduct.articleNum === product.articleNum) setUpdateProduct(initialProduct);
@@ -44,7 +44,7 @@ export const ProductList = () => {
         <ul className="product-list">
             {productList.length > 0 && productList.map((product: IProduct) => {
                 if (updateProduct.articleNum === product.articleNum) {
-                    return <ProductUpdate product={product} closeEdit={setUpdateProduct}/>;
+                    return <ProductUpdate product={product} closeEdit={forceUpdateFn}/>;
                 } else {
                     return (
                         <li key={product.articleNum} className="product-item">
@@ -59,7 +59,7 @@ export const ProductList = () => {
                                     path={showAddAmount === product.articleNum ? '' : mdiPlusCircle}
                                     size={1}/></button>
                                 {showAddAmount === product.articleNum &&
-                                    <ProductAddAmount articleNum={product.articleNum} closeEdit={setShowAddAmount}/>}
+                                    <ProductAddAmount articleNum={product.articleNum} closeEdit={forceUpdateFn}/>}
                             </div>
                             <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
                             {product.detail && <p className="detail">Popisek: {product.detail}</p>}
@@ -74,14 +74,14 @@ export const ProductList = () => {
 export const ProductAddAmount = ({
                                      articleNum,
                                      closeEdit
-                                 }: { articleNum: string, closeEdit: Dispatch<React.SetStateAction<string>> }) => {
+                                 }: { articleNum: string, closeEdit: (isUpdate? :boolean) => void }) => {
     const [amount, setAmount] = useState(0);
     const closeThisWindow = () => {
-        closeEdit('');
+        closeEdit();
     }
     const saveChanges = () => {
         window.Product.addAmount(articleNum, amount);
-        closeEdit("updated!");
+        closeEdit(true);
     }
 
     return (
@@ -100,15 +100,14 @@ export const ProductAddAmount = ({
 export const ProductUpdate = ({
                                   product,
                                   closeEdit
-                              }: { product: IProduct, closeEdit: Dispatch<React.SetStateAction<IProduct>> }) => {
+                              }: { product: IProduct, closeEdit: (isUpdate? :boolean) => void }) => {
     const [stateProduct, setStateProduct] = useState<IProduct>(product);
     const closeThisWindow = () => {
-        closeEdit(initialProduct);
+        closeEdit();
     }
     const saveChanges = () => {
         window.Product.update(stateProduct);
-        initialProduct.articleNum = "updated!";
-        closeEdit(initialProduct);
+        closeEdit(true);
     }
 
     const updateProductState = (key: string, val: string | number) => {
