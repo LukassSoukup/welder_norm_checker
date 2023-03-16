@@ -2,14 +2,12 @@ import type { Configuration } from 'webpack';
 
 import { rules } from './webpack.rules';
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
 export const mainConfig: Configuration = {
   /**
    * This is the main entry point for your application, it's the first file
    * that runs in the main process.
    */
-  mode: isDevelopment ? 'development' : 'production',
+  mode: 'production',
   target: 'electron-main',
   entry: './src/index.ts',
   output: {

@@ -33,26 +33,6 @@ function TextInputWithWhisperer({
     const [productListAll, setProductListAll] = useState<IProduct[]>([]);
     const [localAmountDone, setLocalAmountDone] = useState<IProductAmountList>({});
 
-    let remainingProductAmount: IProductAmountList = {};
-    let filteredProducts: IProduct[];
-    // pro workAssignment - nemůžeš přiřadit víc práce než je celkově allokováno, pokud není nic alokováno, nemůžeš přidělit víc než je počtu produktů
-    // pro dailyLog - zobraz jen ty produkty, které má zaměstnanec allokováno
-    if (productListAll.length > 0) {
-        if (forOrder) {
-            filteredProducts = productListAll.filter((product) =>
-                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && forOrder
-            );
-        } else if (allocatedWork) { // for workAssignment
-            remainingProductAmount = calculateRemainingProductAmountsForWorkAllocation(productListAll, allocatedWork);
-            filteredProducts = productListAll.filter((product) => product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && remainingProductAmount[product.articleNum] > 0);
-        }
-        // pro dailyLog
-        else if (employeeAssignedWork) {
-            filteredProducts = productListAll.filter((product) =>
-                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && employeeAssignedWork[product.articleNum] > 0
-            );
-        }
-    }
     useEffect(() => {
         window.Product.list().then((data) => {
             setProductListAll(data);
@@ -72,6 +52,27 @@ function TextInputWithWhisperer({
             window.removeEventListener("mousedown", handleClickOutside);
         };
     }, [componentRef]);
+
+    let remainingProductAmount: IProductAmountList = {};
+    let filteredProducts: IProduct[];
+    // pro workAssignment - nemůžeš přiřadit víc práce než je celkově allokováno, pokud není nic alokováno, nemůžeš přidělit víc než je počtu produktů
+    // pro dailyLog - zobraz jen ty produkty, které má zaměstnanec allokováno
+    if (productListAll.length > 0) {
+        if (forOrder) {
+            filteredProducts = productListAll.filter((product) =>
+                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && forOrder
+            );
+        } else if (allocatedWork) { // for workAssignment
+            remainingProductAmount = calculateRemainingProductAmountsForWorkAllocation(productListAll, allocatedWork);
+            filteredProducts = productListAll.filter((product) => product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && remainingProductAmount[product.articleNum] > 0);
+        }
+        // pro dailyLog
+        else if (employeeAssignedWork) {
+            filteredProducts = productListAll.filter((product) =>
+                product.articleNum.toLowerCase().includes(state.inputValue.articleNum.toLowerCase()) && employeeAssignedWork[product.articleNum] > 0
+            );
+        }
+    } else return null;
 
     // Define the function to handle changes to the input value
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

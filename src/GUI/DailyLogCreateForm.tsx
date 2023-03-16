@@ -95,7 +95,7 @@ export const DailyLogCreateForm = ({
                        onChange={event => setDate(event.target.value)}/>
             </label>
             <br/>
-            <button className="send-btn" type="submit">Vykázat</button>
+            <button disabled={Object.keys(amountDone).length === 0} className="send-btn" type="submit">Vykázat</button>
         </form>
     );
 };

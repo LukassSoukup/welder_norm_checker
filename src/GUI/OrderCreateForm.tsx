@@ -46,7 +46,7 @@ export const OrderCreateForm = () => {
             </label>
             <br/>
             <div className={"product-inputs"}>
-                <TextInputWithWhisperer amountDone={amountDone} setAmountDone={setAmountDone}
+                <TextInputWithWhisperer setAmountDone={setAmountDone}
                                         setSelectedProductList={setSelectedProductList} forOrder={true}/>
             </div>
             <br/>

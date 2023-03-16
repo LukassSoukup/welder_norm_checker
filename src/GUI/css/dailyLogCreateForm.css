@@ -1,7 +1,8 @@
 .daily-log-create-form {
     position: absolute;
     margin-top: -125px;
-    width: 400px;
+    width: 250px;
+    margin-left: 50px;
     align-content: center;
 }
 .daily-log-create-form label {
@@ -12,8 +13,11 @@
     margin-bottom: 10px;
 }
 .daily-log-create-form input {
-    width: 200px;
-    font-size: 16px;
+    width: 200px !important;
+    font-size: 16px !important;
+}
+#product-inputs {
+    width: 200px !important;
 }
 .log-date {
     font-size: 14px;
