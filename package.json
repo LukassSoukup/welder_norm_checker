@@ -1,7 +1,7 @@
 {
   "name": "roman-hnizdo-app",
   "productName": "Die Normaufsicht",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "ElectronJS desktop application, that keeps track of employees, orders and if the welders are performing based on a given norm",
   "main": ".webpack/main",
   "scripts": {
