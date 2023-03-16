@@ -1,7 +1,8 @@
 import React, {Dispatch, useEffect, useState} from 'react';
-import "./css/orderList.css";
+import "./css/general.css";
+import "./css/productList.css";
 import Icon from '@mdi/react';
-import {mdiCheck, mdiPencil, mdiPlus, mdiWindowClose} from '@mdi/js';
+import {mdiCheck, mdiPencil, mdiPlusCircle, mdiWindowClose} from '@mdi/js';
 
 const initialProduct = {
     articleNum: '',
@@ -16,10 +17,10 @@ export const ProductList = () => {
     const [showAddAmount, setShowAddAmount] = useState('');
 
     useEffect(() => {
-        if(updateProduct.articleNum === "updated!" || showAddAmount === 'updated!') {
-            initialProduct.articleNum =  '';
+        if (updateProduct.articleNum === "updated!" || showAddAmount === 'updated!') {
+            initialProduct.articleNum = '';
             loadProducts();
-        } else if(productList.length === 0) {
+        } else if (productList.length === 0) {
             loadProducts();
         }
     }, [updateProduct, showAddAmount]);
@@ -35,39 +36,45 @@ export const ProductList = () => {
     }
 
     const openAddAmountInput = (id: string) => {
-        if(showAddAmount === id) setShowAddAmount('');
+        if (showAddAmount === id) setShowAddAmount('');
         else setShowAddAmount(id);
     }
 
     return (
-        <div>
-            <ul className="product-list">
-                {productList.length > 0 && productList.map((product: IProduct) => {
-                    if (updateProduct.articleNum === product.articleNum) {
-                        return <ProductUpdate product={product} closeEdit={setUpdateProduct}/>;
-                    } else {
-                        return (
-                            <li key={product.articleNum} className="product-item">
-                                <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
-                                <p className="price-per-product">Cena za kus: {product.price},- Kč</p>
-                                <div>
-                                    <p className="product-amount">Počet: {product.amount} ks</p>
-                                    <button onClick={() => openAddAmountInput(product.articleNum)}><Icon path={mdiPlus} size={1} /></button>
-                                    {showAddAmount === product.articleNum && <ProductAddAmount articleNum={product.articleNum} closeEdit={setShowAddAmount}/>}
-                                </div>
-                                <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
-                                {product.detail && <p className="detail">Popisek: {product.detail}</p>}
-                                <button onClick={() => openMenu(product)}><Icon path={mdiPencil} size={1}/></button>
-                            </li>
-                        );
-                    }
-                })}
-            </ul>
-        </div>
+        <ul className="product-list">
+            {productList.length > 0 && productList.map((product: IProduct) => {
+                if (updateProduct.articleNum === product.articleNum) {
+                    return <ProductUpdate product={product} closeEdit={setUpdateProduct}/>;
+                } else {
+                    return (
+                        <li key={product.articleNum} className="product-item">
+                            <button className="update-product-btn" onClick={() => openMenu(product)}><Icon
+                                path={mdiPencil} size={1}/></button>
+                            <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
+                            <p className="price-per-product">Cena za kus: {product.price},- Kč</p>
+                            <div className="amount-section">
+                                <p className="product-amount">Počet: {product.amount} ks</p>
+                                <button className="add-product-amount-btn"
+                                        onClick={() => openAddAmountInput(product.articleNum)}><Icon
+                                    path={showAddAmount === product.articleNum ? '' : mdiPlusCircle}
+                                    size={1}/></button>
+                                {showAddAmount === product.articleNum &&
+                                    <ProductAddAmount articleNum={product.articleNum} closeEdit={setShowAddAmount}/>}
+                            </div>
+                            <p className="time-to-complete">Čas na zpracování: {product.timeToComplete}</p>
+                            {product.detail && <p className="detail">Popisek: {product.detail}</p>}
+                        </li>
+                    );
+                }
+            })}
+        </ul>
     );
 };
 
-export const ProductAddAmount = ({articleNum, closeEdit}: { articleNum: string, closeEdit: Dispatch<React.SetStateAction<string>> }) => {
+export const ProductAddAmount = ({
+                                     articleNum,
+                                     closeEdit
+                                 }: { articleNum: string, closeEdit: Dispatch<React.SetStateAction<string>> }) => {
     const [amount, setAmount] = useState(0);
     const closeThisWindow = () => {
         closeEdit('');
@@ -78,15 +85,22 @@ export const ProductAddAmount = ({articleNum, closeEdit}: { articleNum: string, 
     }
 
     return (
-        <div>
-            <input className="amount-input" min="0" type="number" value={amount ? amount : ''} onChange={event => setAmount(Number(event.target.value))}/>
-            <button disabled={amount <= 0} className="confirm-update-btn" onClick={() => saveChanges()}><Icon path={mdiCheck} size={1}/></button>
-            <button className="cancel-update-btn" onClick={() => closeThisWindow()}><Icon path={mdiWindowClose} size={1}/></button>
+        <div className="add-product-amount-section">
+            <input className="amount-input" min="0" type="number" placeholder="Přidat počet"
+                   value={amount ? amount : ''}
+                   onChange={event => setAmount(Number(event.target.value))}/>
+            <button disabled={amount <= 0} className="confirm-update-btn" onClick={() => saveChanges()}><Icon
+                path={mdiCheck} size={1}/></button>
+            <button className="cancel-update-btn" onClick={() => closeThisWindow()}><Icon path={mdiWindowClose}
+                                                                                          size={1}/></button>
         </div>
     )
 }
 
-export const ProductUpdate = ({product, closeEdit}: { product: IProduct, closeEdit: Dispatch<React.SetStateAction<IProduct>> }) => {
+export const ProductUpdate = ({
+                                  product,
+                                  closeEdit
+                              }: { product: IProduct, closeEdit: Dispatch<React.SetStateAction<IProduct>> }) => {
     const [stateProduct, setStateProduct] = useState<IProduct>(product);
     const closeThisWindow = () => {
         closeEdit(initialProduct);
@@ -101,11 +115,13 @@ export const ProductUpdate = ({product, closeEdit}: { product: IProduct, closeEd
         setStateProduct((prev) => ({...prev, [key]: val}));
     }
     return (
-        <li>
+        <li className="product-update-section">
             <p className="article-num">Artikel-Nr.: {product.articleNum}</p>
             <label className="price">
                 Cena za kus:
-            <input className="price-input" min="0" placeholder="Kč" type="number" value={stateProduct.price ? stateProduct.price : ''} onChange={event => updateProductState("price", Number(event.target.value))}/>
+                <input className="price-input" min="0" placeholder="Kč" type="number"
+                       value={stateProduct.price ? stateProduct.price : ''}
+                       onChange={event => updateProductState("price", Number(event.target.value))}/>
             </label>
             <br/>
             {/* TODO implement in productController/update
@@ -122,10 +138,15 @@ export const ProductUpdate = ({product, closeEdit}: { product: IProduct, closeEd
             */}
             <label className="description">
                 Poznámka:
-            <input className="description-input" type="text" value={stateProduct.detail} onChange={event => updateProductState("detail", event.target.value)} />
+                <input className="description-input" type="text" value={stateProduct.detail}
+                       onChange={event => updateProductState("detail", event.target.value)}/>
             </label>
-            <button className="confirm-update-btn" onClick={() => saveChanges()}><Icon path={mdiCheck} size={1}/></button>
-            <button className="cancel-update-btn" onClick={() => closeThisWindow()}><Icon path={mdiWindowClose} size={1}/></button>
+            <div className="confirm-section">
+                <button className="confirm-update-btn" onClick={() => saveChanges()}><Icon path={mdiCheck} size={1}/>
+                </button>
+                <button className="cancel-update-btn" onClick={() => closeThisWindow()}><Icon path={mdiWindowClose}
+                                                                                              size={1}/></button>
+            </div>
         </li>
     )
 }

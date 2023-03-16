@@ -3,11 +3,8 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    margin-left: -500px;
     width: 100%;
-    background-color: #f2f2f2;
     padding: 10px;
-    position: absolute;
 }
 
 .main-menu button {
@@ -17,6 +14,6 @@
     text-align: left;
     text-decoration: none;
     display: block;
-    width: 100%;
+    width: 98%;
     cursor: pointer;
 }

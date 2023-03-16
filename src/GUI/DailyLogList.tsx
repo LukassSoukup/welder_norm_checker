@@ -41,7 +41,7 @@ export const DailyLogList = ({employee}: { employee: IEmployee }) => {
                         <p className="money-earned">Výdělek: {formatNumber(log.moneyEarned)},- Kč</p>
                         <p className="norm-time">Normu {log.normAccomplished ? <b className="norm-ok">splnil </b> :
                             <b className="norm-not-ok">nesplnil </b>} o {formatTime(Math.abs(log.normTime))}</p>
-                        <ul className="product-list">
+                        <ul className="log-product-list">
                             {Object.keys(log.productList).map((artikelNum: string) => (
                                 <li key={artikelNum}
                                     className="amount-by-product">{artikelNum} {log.productList[artikelNum]} ks</li>

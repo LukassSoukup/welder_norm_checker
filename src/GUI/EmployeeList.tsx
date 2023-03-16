@@ -14,6 +14,7 @@ export const EmployeeList = () => {
     const dailyLogCreate = "dailyLogCreate";
     const dailyLogList = "dailyLogList";
     const assignWork = "assignWork";
+    const btnColor = 'lightblue';
 
     useEffect(() => {
         getEmployeeList();
@@ -42,9 +43,9 @@ export const EmployeeList = () => {
         else openCreateMenu(id, type)
     }
     const hasWorkAssigned = (employee: IEmployee): boolean => {
-        if(Object.keys(employee.assignedWork).length === 0) return false;
+        if (Object.keys(employee.assignedWork).length === 0) return false;
         let workAmount = 0;
-        for(const articleNum in employee.assignedWork) {
+        for (const articleNum in employee.assignedWork) {
             workAmount += employee.assignedWork[articleNum];
         }
         return workAmount > 0;
@@ -58,29 +59,30 @@ export const EmployeeList = () => {
                     <li key={employee.id} className="employee-item">
                         <div className="employee-details">
                             <h2 className="employee-number">{employee.name}</h2>
-                            <i>{formatNumber(employee.hourlyRate)},- Kč/h</i>
+                            <i className="employee-hourly-rate">{formatNumber(employee.hourlyRate)},- Kč/h</i>
+                            {Object.keys(employee.assignedWork).length > 0 && Object.keys(employee.assignedWork).map((articleNum: string) => {
+                                if (employee.assignedWork[articleNum] === 0) return null;
+                                return <i><b>{articleNum}:</b> {employee.assignedWork[articleNum]} ks</i>
+                            })}
+                            {hasWorkAssigned(employee) ?
+                                <i><b>Doba práce:</b> {formatTime(employee.assignedWorkTime)}</i> : null}
                         </div>
-                        {Object.keys(employee.assignedWork).length > 0 && Object.keys(employee.assignedWork).map((articleNum: string) => {
-                            if (employee.assignedWork[articleNum] === 0) return null;
-                            return (
-                                <div>
-                                    <p><b>{articleNum}:</b> {employee.assignedWork[articleNum]} ks</p>
-                                </div>
-                            )
-                        })}
-                        {hasWorkAssigned(employee) ? <p><b>Očekávaná doba práce:</b> {formatTime(employee.assignedWorkTime)}</p> : null}
-                        <button className="assign-work-btn"
-                                onClick={() => setActionBtn(employee.id, assignWork)}>{isActiveBtn(employee.id, assignWork) ? "Zavřít" : "Přiřadit práci"}</button>
-                        <button className="create-log-btn"
-                                onClick={() => setActionBtn(employee.id, dailyLogCreate)}>{isActiveBtn(employee.id, dailyLogCreate) ? "Zavřít" : "Vykázat práci"}</button>
-                        <button className="list-log-btn"
-                                onClick={() => setActionBtn(employee.id, dailyLogList)}>{isActiveBtn(employee.id, dailyLogList) ? "Zavřít" : "Zobrazit práci"}</button>
-                        {isActiveBtn(employee.id, assignWork) ?
-                            <AssignWorkToEmployee allocatedWork={calculateEmployeeWorkAllocation(employeeList)}
-                                                  employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
-                        {isActiveBtn(employee.id, dailyLogCreate) ?
-                            <DailyLogCreateForm employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
-                        {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee}/> : null}
+                        <div className="employee-buttons">
+                            <button className="assign-work-btn" style={{backgroundColor: `${isActiveBtn(employee.id, assignWork)? btnColor : ''}`}}
+                                    onClick={() => setActionBtn(employee.id, assignWork)}><h3>{isActiveBtn(employee.id, assignWork) ? "Zavřít" : "Přiřadit práci"}</h3></button>
+                            <button className="create-log-btn" style={{backgroundColor: `${isActiveBtn(employee.id, dailyLogCreate)? btnColor : ''}`}}
+                                    onClick={() => setActionBtn(employee.id, dailyLogCreate)}><h3>{isActiveBtn(employee.id, dailyLogCreate) ? "Zavřít" : "Vykázat práci"}</h3></button>
+                            <button className="list-log-btn" style={{backgroundColor: `${isActiveBtn(employee.id, dailyLogList)? btnColor : ''}`}}
+                                    onClick={() => setActionBtn(employee.id, dailyLogList)}><h3>{isActiveBtn(employee.id, dailyLogList) ? "Zavřít" : "Zobrazit práci"}</h3></button>
+                        </div>
+                        <div className="employee-control-panel">
+                            {isActiveBtn(employee.id, assignWork) ?
+                                <AssignWorkToEmployee allocatedWork={calculateEmployeeWorkAllocation(employeeList)}
+                                                      employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
+                            {isActiveBtn(employee.id, dailyLogCreate) ?
+                                <DailyLogCreateForm employee={employee} forceUpdateFn={forceUpdateFn}/> : null}
+                            {isActiveBtn(employee.id, dailyLogList) ? <DailyLogList employee={employee}/> : null}
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -107,10 +109,11 @@ export const AssignWorkToEmployee = ({
             <TextInputWithWhisperer setAmountDone={setAmountToDo} setSelectedProductList={setSelectedProductList}
                                     allocatedWork={allocatedWork}/>
             <br/>
-            <ul className="selected-product-list">
-            {selectedProductList.length > 0 && selectedProductList.map(product => (
-                <li className="selected-product" key={product.articleNum}>{product.articleNum} {amountToDo[product.articleNum]} ks</li>
-            ))}
+            <ul className={selectedProductList.length > 0 ? "selected-product-list" : ''}>
+                {selectedProductList.length > 0 && selectedProductList.map(product => (
+                    <li className="selected-product"
+                        key={product.articleNum}>{product.articleNum} {amountToDo[product.articleNum]} ks</li>
+                ))}
             </ul>
             <button disabled={selectedProductList.length === 0} onClick={() => confirmBtn()}
                     className="send-btn">Přiřadit

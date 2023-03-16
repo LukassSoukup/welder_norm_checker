@@ -7,6 +7,15 @@ button {
     cursor: pointer;
 }
 
+input {
+    font-size: 16px;
+    cursor: text;
+    background-color: transparent;
+}
+label {
+    background-color: #fffcef;
+}
+
 button:hover {
     background-color: #333;
     color: #fff;

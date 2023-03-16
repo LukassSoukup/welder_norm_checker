@@ -1,0 +1,58 @@
+.product-list {
+    width: 500px !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.add-product-amount-btn {
+    width: 35px !important;
+    height: 35px;
+    position: relative;
+    background-color: transparent !important;
+    margin-top: 5px;
+}
+
+.add-product-amount-btn:hover {
+    color: black !important;
+}
+
+.update-product-btn {
+    position: relative;
+    width: 30px !important;
+    background-color: transparent !important;
+    float: right;
+    margin-right: 20px;
+}
+.update-product-btn:hover {
+    color: green !important;
+}
+
+.amount-section {
+    display: flex;
+}
+
+.cancel-update-btn, .confirm-update-btn {
+    width: 40px !important;
+    height: 40px !important;
+    background-color: transparent !important;
+}
+.cancel-update-btn:hover, .confirm-update-btn:hover {
+    color: black !important;
+}
+.add-product-amount-section {
+    display: inline-flex;
+    background-color: #fffcef;
+}
+
+.amount-input {
+    background-color: transparent !important;
+}
+
+.product-update-section {
+    width: 200px;
+}
+
+.confirm-section {
+    display: inline-flex;
+}

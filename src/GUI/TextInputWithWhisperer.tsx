@@ -150,7 +150,7 @@ function TextInputWithWhisperer({
     }
 
     return (
-        <>
+        <div className="textInputWithWhisperer-section">
             <div className="textInputWithWhisperer" ref={componentRef}>
                 <div className="arrow"></div>
                 <input
@@ -183,7 +183,7 @@ function TextInputWithWhisperer({
                     <button onClick={onConfirmBtnClick}>Potvrdit</button>
                 </>
             }
-        </>
+        </div>
     );
 }
 

@@ -31,7 +31,7 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="create-product-form" onSubmit={handleSubmit}>
             <label className="article-num">
                 Artikel-Nr.:
                 <input className="article-num-input" type="text" value={articleNum} onChange={event => setArticleNum(event.target.value)} required/>
@@ -43,9 +43,9 @@ export const ProductCreateForm = ({addProductToOrder}: ProductCreateFormProps) =
             </label>
             <br />
             <label className="amount">
-                Počet <i className="amount-desc">(počet těchto produktů bude veden mimo objednávky)</i>:
+                Počet:
                 <br />
-                <input className="amount-input" min="0" type="number" value={amount ? amount : ''} onChange={event => setAmount(Number(event.target.value))}/>
+                <input className="amount-input" placeholder="počet" min="0" type="number" value={amount ? amount : ''} onChange={event => setAmount(Number(event.target.value))}/>
             </label>
             <br />
             <label className="time-to-complete">

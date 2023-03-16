@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import TextInputWithWhisperer from "./TextInputWithWhisperer";
 import {toMillis} from "../helpers/timeFormatHelper";
-import "./css/dailyLogCreateForm.css";
 import "./css/general.css";
+import "./css/dailyLogCreateForm.css";
 
 const defaultArrivedToWork = '07:00'
 const defaultLeftWork = '17:00'
@@ -81,7 +81,7 @@ export const DailyLogCreateForm = ({
                 <TextInputWithWhisperer setAmountDone={setAmountDone}
                                         setSelectedProductList={setSelectedProductList}
                                         employeeAssignedWork={employee.assignedWork}/>
-                <ul className="selected-product-list">
+                <ul className={selectedProductList.length > 0 ? "selected-product-list" : ''}>
                     {selectedProductList.length > 0 && selectedProductList.map(product => (
                         <li className="selected-product"
                             key={product.articleNum}>{product.articleNum} {amountDone[product.articleNum]} ks</li>
